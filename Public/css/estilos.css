@@ -1,0 +1,48 @@
+
+body{font-family: Arial, Helvetica, sans-serif;}
+.titulo {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 16px;
+	background-color: #6CF; alin ;
+	background-repeat: repeat;
+	
+	
+
+}
+.nom_campos{
+   
+}
+.dat_campos{padding-bottom: 5px; padding: 5px 5px; margin: 50px 60px; box-sizing: border-box;}
+.block-border{margin-top:10px;border:5px solid #FFA500;  border-radius:20px 0px 20px 0px;padding:8px;box-shadow:0 0 5px rgba(0,0,0,0.5)}
+.block-border{margin-top:100px}
+.block-border{margin-left: 150px}
+.block-border{margin-right: 150px}
+.block-border {box-shadow:50px 20px 50px 20px #90EE90 inset}
+
+input[type=text],
+input[type=password],
+textarea {
+	width: 150%;
+  border-top: 1px solid #ccc;
+  border-left: 1px solid #ccc;
+  border-right: 1px solid #eee;
+  border-bottom: 1px solid #eee;
+}
+input[type=text],
+input[type=password] {
+  width: 100%;
+}
+
+#footer {
+	border: solid 1px #ccc;
+}
+a, a:hover, a:active, .smallText .button{
+    text-decoration: none;
+    color: green;
+    font-weight: bold;
+}
+input[type=submit]{
+    padding: 10px;
+    width: 100%;
+
+}
