@@ -1,107 +1,237 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<?php
+session_start();
+if (!isset($_SESSION['logged']) || $_SESSION['logged'] !== true) {
+    echo "<script>alert('Debes iniciar sesión para acceder.'); window.location.href = 'login.php';</script>";
+    exit;
+}
+session_regenerate_id(true); // Seguridad: prevenir secuestro de sesión
+?>
+<!DOCTYPE html>
+<html lang="es">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Administrativo AFTP - Menú Principal</title>
 
-<!-- visor meta para restablecer la escala inital iPhone -->
-<meta name="viewport" content="width=device-width, initial-scale=1.0"
-  
-  
-  <?php
-  error_reporting(0);
-  
-    if (!isset($_SESSION['logged'])) {
-		session_start();
-		}
-	    
-  
-    if(!$_SESSION['logged']){ 
-    print "<script type=\"text/javascript\">"; 
-	
-    print "window.location.href = 'login.php';" ;
-    print "</script>";  
-    exit; 
-    }
-  ?>
-  <meta charset="utf-8">
-  <title>Sistema Administrativo AFTP - Menú Principal ver 1.2</title>
-  <link href="estilos.css" rel="stylesheet" type="text/css">
-  <style type="text/css">
-  #apDiv1 {
-	position: absolute;
-	width: 1276px;
-	height: 183px;
-	z-index: 1;
-	left: 4px;
-	top: 7px;
-}
-  #apDiv2 {
-	position: absolute;
-	width: 1275px;
-	height: 396px;
-	z-index: 2;
-	left: 3px;
-	top: 193px;
-}
-  </style>
-  <link href="SpryAssets/SpryMenuBarHorizontal.css" rel="stylesheet" type="text/css">
-  <style type="text/css">
-  #apDiv3 {
-	position: absolute;
-	width: 149px;
-	height: 27px;
-	z-index: 3;
-	left: 298px;
-	top: 19px;
-}
-  </style>
-  <link href="Public/css/estilos.css" rel="stylesheet"/>
-  <script src="SpryAssets/SpryMenuBar.js" type="text/javascript"></script>
-  </head>
-    
-  <body>
-  <div class="titulo" id="apDiv1">
-    <p><img src="LogoVeramedWEB.jpg" width="293" height="119"></p>
-    <p>Sistema de Control de Archivo- Menu Principal</p>
-    <div id="apDiv3"><a href="logout.php">Cerrar sesión</a></div>
-    <p>&nbsp;</p>
-  </div>
-  <div id="apDiv2">
-    <ul id="MenuBar1" class="MenuBarHorizontal">
-      <li><a class="MenuBarItemSubmenu" href="#">Fichas</a>
-        <ul>
-          <li><a href="cia01.php">Compañías</a></li>
-          <li><a href="clientes01.php">Clientes</a></li>
-          <li><a href="proveedores01.php">Proveedores</a></li>
-        </ul>
-      </li>
-      <li><a href="#">Ingreso AFTP  </a>
-        <ul>
-          <li><a href="factura01.php">Ingreso de Factura</a></li>
-          <li><a href="buscarfactura.php">Consulta</a></li>
-        </ul>
-      </li>
-      <li><a class="MenuBarItemSubmenu" href="#">Gastos</a>
-        <ul>
-          <li><a href="gastos01.php">Ingreso de Gastos</a></li>
-        </ul>
-      </li>
-      <li><a href="#" class="MenuBarItemSubmenu">Reportes</a>
-        <ul>
-          <li><a href="reportefacturas.php">Facturas Recibidas</a></li>
-          <li><a href="reportegastos.php">Gastos Recibidos</a></li>
-          <li><a href="reporteprov.php">Listado de Proveedores</a></li>
-        </ul>
-      </li>
-  
-    </ul>
-    <a href="logout.php"></a>
-  </div>
-  <p>&nbsp; </p>
-  <p>&nbsp; </p>
-  <script type="text/javascript">
-var MenuBar1 = new Spry.Widget.MenuBar("MenuBar1", {imgDown:"SpryAssets/SpryMenuBarDownHover.gif", imgRight:"SpryAssets/SpryMenuBarRightHover.gif"});
+    <!-- Estilos mejorados -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f4f4f4;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .titulo {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap; /* Evita superposición en pantallas pequeñas */
+            padding: 10px;
+            background: #007bff;
+            color: white;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .titulo img {
+            height: 50px;
+        }
+
+        .menu {
+            text-align: right;
+        }
+
+        .menu a {
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+            background: red;
+            padding: 8px 12px;
+            border-radius: 5px;
+            display: inline-block;
+            margin-top: 5px; /* Espaciado en móviles */
+        }
+
+        .menu a:hover {
+            background: darkred;
+        }
+
+        /* Estilo del menú */
+        .nav {
+            background: #343a40;
+            border-radius: 0 0 8px 8px;
+        }
+
+        .nav ul {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .nav ul li {
+            position: relative;
+        }
+
+        .nav ul li a {
+            display: block;
+            padding: 15px 20px;
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .nav ul li:hover {
+            background: #495057;
+        }
+
+        /* Submenú oculto */
+        .nav ul li ul {
+            display: none;
+            position: absolute;
+            background: #495057;
+            min-width: 200px;
+            top: 100%;
+            left: 0;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 0;
+        }
+
+        .nav ul li ul li {
+            display: block;
+            text-align: left;
+        }
+
+        .nav ul li ul li a {
+            padding: 10px;
+            font-size: 14px;
+            display: block;
+        }
+
+        .nav ul li ul li a:hover {
+            background: #007bff;
+        }
+
+        /* Responsivo */
+        @media (max-width: 768px) {
+            .titulo {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .menu {
+                text-align: center;
+                width: 100%;
+                margin-top: 10px;
+            }
+
+            .nav ul {
+                flex-direction: column;
+                text-align: left;
+            }
+
+            .nav ul li {
+                width: 100%;
+            }
+
+            .nav ul li ul {
+                position: relative;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Encabezado -->
+        <div class="titulo">
+            <img src="LogoVeramedWEB.jpg" alt="Logo">
+            <h2>Sistema de Control de Archivo</h2>
+            <div class="menu"><a href="logout.php">Cerrar sesión</a></div>
+        </div>
+
+        <!-- Menú de navegación -->
+        <nav class="nav">
+            <ul>
+                <li>
+                    <a href="#" class="menu-toggle">Fichas ▼</a>
+                    <ul>
+                        <li><a href="cia01.php">Compañías</a></li>
+                        <li><a href="clientes01.php">Clientes</a></li>
+                        <li><a href="proveedores01.php">Proveedores</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#" class="menu-toggle">Ingreso AFTP ▼</a>
+                    <ul>
+                        <li><a href="factura01.php">Ingreso de Factura</a></li>
+                        <li><a href="buscarfactura.php">Consulta</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#" class="menu-toggle">Gastos ▼</a>
+                    <ul>
+                        <li><a href="gastos01.php">Ingreso de Gastos</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#" class="menu-toggle">Reportes ▼</a>
+                    <ul>
+                        <li><a href="reportefacturas.php">Facturas Recibidas</a></li>
+                        <li><a href="reportegastos.php">Gastos Recibidos</a></li>
+                        <li><a href="reporteprov.php">Listado de Proveedores</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <script>
+        // Activa el menú desplegable al hacer clic
+        document.querySelectorAll('.menu-toggle').forEach(item => {
+            item.addEventListener('click', function (event) {
+                event.preventDefault(); // Evita que el enlace navegue
+                let submenu = this.nextElementSibling;
+                
+                // Cierra otros submenús abiertos
+                document.querySelectorAll('.nav ul li ul').forEach(menu => {
+                    if (menu !== submenu) {
+                        menu.style.display = 'none';
+                    }
+                });
+
+                // Alterna la visibilidad del submenú actual
+                submenu.style.display = submenu.style.display === 'block' ? 'none' : 'block';
+            });
+        });
+
+        // Cerrar menú al hacer clic fuera
+        document.addEventListener('click', function (event) {
+            let isClickInsideMenu = event.target.closest('.nav ul li');
+            if (!isClickInsideMenu) {
+                document.querySelectorAll('.nav ul li ul').forEach(menu => {
+                    menu.style.display = 'none';
+                });
+            }
+        });
     </script>
-  </body>
+</body>
 </html>
-

@@ -1,42 +1,50 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="es">
 <head>
-<meta charset="utf-8">
-<title>Validación de Datos </title>
+    <meta charset="utf-8">
+    <title>Validación de Datos</title>
 </head>
+<body>
+
 <?php
+require 'db.php'; // Incluir la conexión
 
-  $codigo=$_REQUEST['codigo'];
-  $razonsoc=$_REQUEST['razonsoc'];
-  $rif=$_REQUEST['rif'];
-  $dir=$_REQUEST['direccion'];
-  $hoy=date("Ymd"); 
-  error_reporting(E_ALL ^ E_DEPRECATED);
-  $conexion=mysql_connect("localhost","root","Joybook") 
-      or die("Problemas en la conexion");
-	  
-  mysql_select_db("vema",$conexion) or
-      die("Problemas en la seleccion de la base de datos");
-	  
-  $insert = mysql_query("insert into compania(codigo,razonsoc,rif,direccion,fecha) values 
-   ('$codigo','$razonsoc','$rif','$dir','$hoy')",$conexion) 
-       or die("Problemas en el select".mysql_error());
-	   
-  mysql_close($conexion);
-  
-  if ($insert) {
-     print "<script type=\"text/javascript\">"; 
-     print "alert('Los datos fueron guardados con exito.');"; 
-      print "window.location.href = 'cia01.php';";
-     print "</script>";  
-  }
-  
-  
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Recibir datos y limpiar entrada
+    $codigo = htmlspecialchars(trim($_POST['codigo']));
+    $razonsoc = htmlspecialchars(trim($_POST['razonsoc']));
+    $nit = htmlspecialchars(trim($_POST['rif']));
+    $dir = htmlspecialchars(trim($_POST['direccion']));
+    $hoy = date("Ymd"); 
 
+    try {
+        // Preparar consulta para evitar inyección SQL
+        $stmt = $pdo->prepare("INSERT INTO compania (codigo, razonsoc, rif, direccion, fecha) 
+                               VALUES (:codigo, :razonsoc, :rif, :direccion, :fecha)");
+
+        // Ejecutar consulta
+        if ($stmt->execute([
+            ':codigo' => $codigo,
+            ':razonsoc' => $razonsoc,
+            ':nit' => $nit,
+            ':direccion' => $dir,
+            ':fecha' => $hoy
+        ])) {
+            echo "<script>
+                    alert('Los datos fueron guardados con éxito.');
+                    window.location.href = 'cia01.php';
+                  </script>";
+        } else {
+            echo "<p>Error al guardar los datos.</p>";
+        }
+
+    } catch (PDOException $e) {
+        echo "<p>Error en la conexión: " . htmlspecialchars($e->getMessage()) . "</p>";
+    }
+} else {
+    echo "<p>Método de acceso no permitido.</p>";
+}
 ?>
 
-
-
-<body>
 </body>
 </html>

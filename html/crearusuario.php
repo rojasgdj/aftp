@@ -1,104 +1,70 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html lang="es">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>Documento sin título</title>
+    <meta charset="utf-8">
+    <title>Registro de Usuario</title>
 </head>
-
 <body>
 
-<p>
-  <?php 
-   define("ENCRYPTION_KEY", "Llave123"); 
-   error_reporting(E_ALL ^ E_DEPRECATED);
-   $cedula = $_REQUEST['cedula'];
-   $clave1 = $_REQUEST['clave1'];
-   $clave2 = $_REQUEST['clave2'];
-   $hoy = date("Y-m-d H:s:i");
-   if ($clave1<>$clave2) {
-	   
-	    print "<script type=\"text/javascript\">"; 
-        print "alert('Las contraseñan no son iguales.');"; 
-        print "window.history.back();" ;
-        print "</script>";  
-   
-   }
-   $encrypted = encrypt($clave1, ENCRYPTION_KEY);
-   $conexion = mysql_connect("localhost", "root","Joybook");
-   mysql_query("SET NAMES 'utf8'");
-   mysql_select_db("vema", $conexion);
-   
-   $buscar = "SELECT * FROM empmain WHERE cedula=$cedula";
-   $valida1 = mysql_query($buscar, $conexion) or die(mysql_error());
-   $numero_filas = mysql_num_rows($valida1);
-   
-    if ($numero_filas==0) {
-		 print "<script type=\"text/javascript\">"; 
-        print "alert('El número de cedula no esta registrado como empleado VERAMED.');"; 
-        print "window.history.back();" ;
-        print "</script>";  
+<?php
+require 'db.php'; // Incluir la conexión
 
-		
-	}else {
-	
- 
-      $conexion = mysql_connect("localhost", "root","Joybook");
-      mysql_select_db("vema", $conexion);
-      $buscar = "SELECT * FROM usuarios WHERE cedula=$cedula";
-      $valida1 = mysql_query($buscar, $conexion) or die(mysql_error());
-      $numero_filas = mysql_num_rows($valida1); 
-   
-      if ($numero_filas>0) {
-	    print "<script type=\"text/javascript\">"; 
-        print "alert('El número de cedula ya está registrada.');"; 
-        print "window.history.back();" ;
-        print "</script>";  
- 
-      }
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Recibir y sanitizar datos
+    $cedula = htmlspecialchars(trim($_POST['cedula']));
+    $clave1 = htmlspecialchars(trim($_POST['clave1']));
+    $clave2 = htmlspecialchars(trim($_POST['clave2']));
+    $hoy = date("Y-m-d H:i:s");
 
-   
-      if ($numero_filas==0)  {
-	   
-	   $inserta = "INSERT INTO usuarios (cedula,clave,fecha) VALUES 			  
-	   ($cedula,'$encrypted','$hoy')";
-	  
-	   mysql_query($inserta, $conexion) or die(mysql_error());
-	   print "<script type=\"text/javascript\">"; 
-       print "alert('El usuario fue registrado con exito.');"; 
-       print "window.top.location.href = 'login.php';" ;
-       print "</script>";  
-	   
-       } else {
-	   
-       };
-	}
-	
-	/**
- * Returns an encrypted & utf8-encoded
- */
-function encrypt($pure_string, $encryption_key) {
-    $iv_size = mcrypt_get_iv_size(MCRYPT_BLOWFISH, MCRYPT_MODE_ECB);
-    $iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);
-    $encrypted_string = mcrypt_encrypt(MCRYPT_BLOWFISH, $encryption_key, utf8_encode($pure_string), MCRYPT_MODE_ECB, $iv);
-    return $encrypted_string;
+    // Validar que las contraseñas coincidan
+    if ($clave1 !== $clave2) {
+        echo "<script>alert('Las contraseñas no son iguales.'); window.history.back();</script>";
+        exit;
+    }
+
+    try {
+        // Verificar si la cédula está registrada en `empmain`
+        $stmt = $pdo->prepare("SELECT * FROM empmain WHERE cedula = :cedula");
+        $stmt->execute([':cedula' => $cedula]);
+
+        if ($stmt->rowCount() === 0) {
+            echo "<script>alert('El número de cédula no está registrado como empleado.'); window.history.back();</script>";
+            exit;
+        }
+
+        // Verificar si la cédula ya está en `usuarios`
+        $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE cedula = :cedula");
+        $stmt->execute([':cedula' => $cedula]);
+
+        if ($stmt->rowCount() > 0) {
+            echo "<script>alert('El número de cédula ya está registrado.'); window.history.back();</script>";
+            exit;
+        }
+
+        // Hash de la contraseña (seguro)
+        $hashed_password = password_hash($clave1, PASSWORD_BCRYPT);
+
+        // Insertar nuevo usuario
+        $stmt = $pdo->prepare("INSERT INTO usuarios (cedula, clave, fecha) VALUES (:cedula, :clave, :fecha)");
+        $insert = $stmt->execute([
+            ':cedula' => $cedula,
+            ':clave' => $hashed_password,
+            ':fecha' => $hoy
+        ]);
+
+        if ($insert) {
+            echo "<script>alert('El usuario fue registrado con éxito.'); window.top.location.href = 'login.php';</script>";
+        } else {
+            echo "<p>Error al registrar el usuario.</p>";
+        }
+
+    } catch (PDOException $e) {
+        echo "<p>Error en la conexión: " . htmlspecialchars($e->getMessage()) . "</p>";
+    }
+} else {
+    echo "<p>Método de acceso no permitido.</p>";
 }
-
-/**
- * Returns decrypted original string
- */
-function decrypt($encrypted_string, $encryption_key) {
-    $iv_size = mcrypt_get_iv_size(MCRYPT_BLOWFISH, MCRYPT_MODE_ECB);
-    $iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);
-    $decrypted_string = mcrypt_decrypt(MCRYPT_BLOWFISH, $encryption_key, $encrypted_string, MCRYPT_MODE_ECB, $iv);
-    return $decrypted_string; }
-    
-
-   
 ?>
-  
-  
-</p>
 
-<p>&nbsp;</p>
 </body>
 </html>

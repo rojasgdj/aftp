@@ -1,32 +1,32 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>Documento sin título</title>
-</head>
+<?php
+session_start();
 
-<body>
+// Si no hay sesión activa, redirigir al login de inmediato
+if (!isset($_SESSION['logged'])) {
+    header("Location: login.php");
+    exit;
+}
 
-<p>
-  <?php 
+// Evitar que el navegador almacene caché (previene volver atrás tras logout)
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
 
-  
-	  
-	  session_start();
-      $_SESSION = array();
-	  session_destroy();
-	  
-	   print "<script type=\"text/javascript\">";  
-       print "window.location.href = 'login.php';" ;
-       print "</script>";  
-	  
- 
-   
+// Destruir la sesión si está activa
+session_unset();
+session_destroy();
+
+// Eliminar la cookie de sesión de forma segura
+if (ini_get("session.use_cookies")) {
+    $params = session_get_cookie_params();
+    setcookie(session_name(), '', time() - 42000, 
+        $params["path"], $params["domain"], 
+        $params["secure"], $params["httponly"]
+    );
+}
+
+// Redirigir al usuario al login con mensaje opcional
+header("Location: login.php?logout=success");
+exit;
 ?>
-  
-  
-</p>
 
-<p>&nbsp;</p>
-</body>
-</html>

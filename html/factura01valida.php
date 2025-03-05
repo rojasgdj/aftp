@@ -1,50 +1,69 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="es">
 <head>
-<meta charset="utf-8">
-<title>Validación de Datos </title>
+    <meta charset="utf-8">
+    <title>Validación de Datos</title>
 </head>
+<body>
+
 <?php
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    require 'db.php'; // Conexión centralizada
 
-  $factura=$_REQUEST['factura'];
-  $conceptop=$_REQUEST['concepto'];
-  $fecha=$_REQUEST['fecha'];
-  $fechaems=substr($fecha,6,4).substr($fecha,3,2).substr($fecha,0,2); 
-  $cliente=$_REQUEST['cliente'];
-  $monto=$_REQUEST['monto'];
-  $cia=1;
-  $hoy=date("Y-m-d H:i:s"); 
-  error_reporting(E_ALL ^ E_DEPRECATED);
-  $conexion=mysql_connect("localhost","root","Joybook") 
-      or die("Problemas en la conexion");
-	  
-  mysql_select_db("vema",$conexion) or
-      die("Problemas en la seleccion de la base de datos");
-	  
-  $comando="insert into facturas (numero,concepto,codcli,fechaems,fechacre,monto,status,codcia) values 
-   ($factura,'$conceptop',$cliente,'$fechaems','$hoy',$monto,'ACTIVA',$cia)";
+    try {
+        // Recibir y sanitizar datos
+        $factura  = intval($_POST['factura']); // Asegurar que sea número
+        $concepto = trim($_POST['concepto']);
+        $fecha    = trim($_POST['fecha']);
+        $cliente  = intval($_POST['cliente']);
+        $monto    = floatval($_POST['monto']);
+        $cia      = 1;
+        $hoy      = date("Y-m-d H:i:s");
 
-  $insert = mysql_query($comando,$conexion) 
-       or die("Problemas en el select: "."<br>".mysql_error()."<br>".$comando);
-	   
-  
-  if ($insert) {
-	 echo "Datos Guardados con exito."; 
-     print "<script type=\"text/javascript\">"; 
-     print "alert('Los datos fueron guardados con exito.');"; 
-      print "window.location.href = 'factura01.php';";
-     print "</script>";  
-  }
-  mysql_close($conexion);
-  //header('Location: cia01.php'); 
-  //exit();
-  
+        // Convertir fecha de dd/mm/yyyy a YYYY-MM-DD
+        $fechaems = DateTime::createFromFormat('d/m/Y', $fecha);
+        if ($fechaems) {
+            $fechaems = $fechaems->format('Y-m-d');
+        } else {
+            echo "<script>alert('Formato de fecha incorrecto.'); window.history.back();</script>";
+            exit;
+        }
 
+        // Validar campos obligatorios
+        if (empty($factura) || empty($concepto) || empty($cliente) || empty($monto)) {
+            echo "<script>alert('Todos los campos son obligatorios.'); window.history.back();</script>";
+            exit;
+        }
 
+        // Insertar en la base de datos usando sentencias preparadas
+        $stmt = $pdo->prepare("INSERT INTO facturas (numero, concepto, codcli, fechaems, fechacre, monto, status, codcia) 
+                               VALUES (:numero, :concepto, :codcli, :fechaems, :fechacre, :monto, 'ACTIVA', :codcia)");
+
+        $stmt->execute([
+            ':numero'   => $factura,
+            ':concepto' => $concepto,
+            ':codcli'   => $cliente,
+            ':fechaems' => $fechaems,
+            ':fechacre' => $hoy,
+            ':monto'    => $monto,
+            ':codcia'   => $cia
+        ]);
+
+        echo "<script>
+                alert('Los datos fueron guardados con éxito.');
+                window.location.href = 'factura01.php';
+              </script>";
+
+        // Cerrar conexión
+        $pdo = null;
+        
+    } catch (PDOException $e) {
+        die("Error en la conexión: " . htmlspecialchars($e->getMessage()));
+    }
+} else {
+    echo "<p>Método de acceso no permitido.</p>";
+}
 ?>
 
-
-
-<body>
 </body>
 </html>
