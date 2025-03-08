@@ -1,106 +1,244 @@
 <?php
-require_once 'db.php'; // Incluir archivo de conexión a la BD
+require 'db.php'; // Conectar a la base de datos
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema Administrativo AFTP - Proveedores</title>
-    <link href="estilos.css" rel="stylesheet" type="text/css">
-    <link href="SpryAssets/SpryTabbedPanels.css" rel="stylesheet" type="text/css">
-    <link href="SpryAssets/SpryValidationTextField.css" rel="stylesheet" type="text/css">
-    <link href="SpryAssets/SpryValidationTextarea.css" rel="stylesheet" type="text/css">
-
-    <script src="SpryAssets/SpryTabbedPanels.js"></script>
-    <script src="SpryAssets/SpryValidationTextField.js"></script>
-    <script src="SpryAssets/SpryValidationTextarea.js"></script>
 
     <style>
-        #apDiv1 { position: absolute; width: 1276px; height: 220px; z-index: 1; left: 4px; top: 7px; }
-        #apDiv2 { position: absolute; width: 1275px; height: 396px; z-index: 2; left: 2px; top: 241px; }
-        #apDiv3 { position: absolute; width: 117px; height: 28px; z-index: 3; left: 297px; top: 18px; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f4f4f4;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .titulo {
+            text-align: center;
+            background: #007bff;
+            color: white;
+            padding: 15px;
+            border-radius: 8px 8px 0 0;
+            margin-bottom: 20px;
+        }
+
+        .menu {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+
+        .menu a {
+            text-decoration: none;
+            background-color: #28a745;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .menu a:hover {
+            background: #218838;
+        }
+
+        .tab-container {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            background: #007bff;
+            color: white;
+            width: 150px;
+            text-align: center;
+        }
+
+        .tab:hover {
+            background: #0056b3;
+        }
+
+        .content {
+            display: none;
+            padding: 20px;
+            background: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .active {
+            display: block;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            background: #28a745;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        button:hover {
+            background: #218838;
+        }
+
+        .print-btn {
+            background: #17a2b8;
+            margin-bottom: 15px;
+        }
+
+        .print-btn:hover {
+            background: #138496;
+        }
     </style>
 </head>
-    
+
 <body>
-    <div class="titulo" id="apDiv1">
-        <p><img src="LogoVeramedWEB.jpg" width="293" height="119"></p>
-        <p>Sistema de Control de Archivo - Proveedores</p>
-        <div id="apDiv3"><a href="index.php" title="Ir al Menú Inicio">Menú Inicio</a></div>
-    </div>
+    <div class="container">
+        <!-- Título -->
+        <div class="titulo">
+            <h2>Sistema de Control de Archivo - Proveedores</h2>
+        </div>
 
-    <div id="apDiv2">
-        <div id="TabbedPanels1" class="TabbedPanels">
-            <ul class="TabbedPanelsTabGroup">
-                <li class="TabbedPanelsTab" tabindex="0">Datos Iniciales</li>
-                <li class="TabbedPanelsTab" tabindex="0">Listado</li>
-            </ul>
-            <div class="TabbedPanelsContentGroup">
-                <!-- Formulario de Creación -->
-                <div class="TabbedPanelsContent">
-                    <p>Creación de Proveedores</p>
-                    <form method="post" action="proveedores01valida.php">
-                        <table>
-                            <tr>
-                                <td><label for="rif"><b>RIF</b></label></td>
-                                <td><input type="text" name="rif" id="rif" required></td>
-                            </tr>
-                            <tr>
-                                <td><label for="razonsoc"><b>Razón Social</b></label></td>
-                                <td><input type="text" name="razonsoc" id="razonsoc" maxlength="100" required></td>
-                            </tr>
-                            <tr>
-                                <td><label for="direccion"><b>Dirección</b></label></td>
-                                <td><textarea name="direccion" id="direccion" cols="45" rows="5" required></textarea></td>
-                            </tr>
-                            <tr>
-                                <td><label for="telefono"><b>Teléfono</b></label></td>
-                                <td><input type="text" name="telefono" id="telefono" required></td>
-                            </tr>
-                            <tr>
-                                <td><label for="persona"><b>Persona Contacto</b></label></td>
-                                <td><input type="text" name="persona" id="persona" maxlength="50" required></td>
-                            </tr>
-                        </table>
-                        <p><input type="submit" value="Insertar"></p>
-                    </form>
-                </div>
+        <!-- Menú -->
+        <div class="menu">
+            <a href="index.php">Menú Inicio</a>
+        </div>
 
-                <!-- Listado de Proveedores -->
-                <div class="TabbedPanelsContent">
-                    <p>Últimos Proveedores Registrados</p>
-                    <?php
-                    try {
-                        // Consulta de proveedores
-                        $stmt = $conexion->query("SELECT codprov, rif, razonsoc FROM proveedores ORDER BY fechacre DESC LIMIT 10");
+        <!-- Pestañas -->
+        <div class="tab-container">
+            <div class="tab" onclick="openTab('crear')">Nuevo Proveedor</div>
+            <div class="tab" onclick="openTab('listado')">Listado</div>
+        </div>
 
-                        if ($stmt->rowCount() > 0) {
-                            echo "<table border='1'>";
-                            echo "<tr><th>Código</th><th>RIF</th><th>Razón Social</th></tr>";
+        <!-- Formulario de creación -->
+        <div id="crear" class="content active">
+            <h3>Registrar Proveedor</h3>
+            <form id="proveedorForm" method="post" action="proveedores01valida.php">
+                <label for="nit"><b>NIT</b></label>
+                <input type="text" name="nit" id="nit" maxlength="20" required>
 
-                            while ($reg = $stmt->fetch()) {
-                                echo "<tr>";
-                                echo "<td>" . htmlspecialchars($reg['codprov']) . "</td>";
-                                echo "<td>" . htmlspecialchars($reg['rif']) . "</td>";
-                                echo "<td>" . htmlspecialchars($reg['razonsoc']) . "</td>";
-                                echo "</tr>";
-                            }
+                <label for="razon_social"><b>Razón Social</b></label>
+                <input type="text" name="razon_social" id="razon_social" maxlength="100" required>
 
-                            echo "</table>";
-                        } else {
-                            echo "<p>No hay proveedores registrados.</p>";
+                <label for="direccion_fiscal"><b>Dirección Fiscal</b></label>
+                <textarea name="direccion_fiscal" id="direccion_fiscal" rows="3" required></textarea>
+
+                <label for="telefono"><b>Teléfono</b></label>
+                <input type="text" name="telefono" id="telefono" maxlength="20" required>
+
+                <label for="contacto"><b>Persona de Contacto</b></label>
+                <input type="text" name="contacto" id="contacto" maxlength="50" required>
+
+                <button type="submit">Registrar</button>
+            </form>
+        </div>
+
+        <!-- Listado de proveedores -->
+        <div id="listado" class="content">
+            <h3>Listado de Proveedores</h3>
+
+            <!-- Botón para imprimir -->
+            <button onclick="printTable()" class="print-btn">🖨️ Imprimir Listado</button>
+
+            <div id="printArea">
+                <?php
+                try {
+                    // Consulta de proveedores
+                    $stmt = $pdo->query("SELECT cod_proveedor, nit, razon_social, telefono, contacto, status, fecha_creacion FROM proveedores ORDER BY fecha_creacion DESC");
+
+                    if ($stmt->rowCount() > 0) {
+                        echo "<table>";
+                        echo "<tr><th>Código</th><th>NIT</th><th>Razón Social</th><th>Teléfono</th><th>Contacto</th><th>Estado</th><th>Fecha Creación</th></tr>";
+
+                        while ($reg = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                            echo "<tr>";
+                            echo "<td>" . htmlspecialchars($reg['cod_proveedor']) . "</td>";
+                            echo "<td>" . htmlspecialchars($reg['nit']) . "</td>";
+                            echo "<td>" . htmlspecialchars($reg['razon_social']) . "</td>";
+                            echo "<td>" . htmlspecialchars($reg['telefono']) . "</td>";
+                            echo "<td>" . htmlspecialchars($reg['contacto']) . "</td>";
+                            echo "<td>" . htmlspecialchars($reg['status']) . "</td>";
+                            echo "<td>" . htmlspecialchars($reg['fecha_creacion']) . "</td>";
+                            echo "</tr>";
                         }
-                    } catch (PDOException $e) {
-                        echo "<p>Error en la consulta: " . $e->getMessage() . "</p>";
+
+                        echo "</table>";
+                    } else {
+                        echo "<p>No hay proveedores registrados.</p>";
                     }
-                    ?>
-                </div>
+                } catch (PDOException $e) {
+                    echo "<p>Error en la consulta: " . htmlspecialchars($e->getMessage()) . "</p>";
+                }
+                ?>
             </div>
         </div>
     </div>
 
     <script>
-        var TabbedPanels1 = new Spry.Widget.TabbedPanels("TabbedPanels1");
+        function openTab(tabId) {
+            document.querySelectorAll(".content").forEach(el => el.classList.remove("active"));
+            document.getElementById(tabId).classList.add("active");
+        }
+
+        function printTable() {
+            var content = document.getElementById("printArea").innerHTML;
+            var originalContent = document.body.innerHTML;
+
+            document.body.innerHTML = content;
+            window.print();
+            document.body.innerHTML = originalContent;
+        }
     </script>
 </body>
 </html>

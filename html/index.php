@@ -1,10 +1,16 @@
 <?php
 session_start();
+
+// Evitar caché para prevenir que se acceda a la página después del logout
+header("Cache-Control: no-cache, no-store, must-revalidate");
+header("Pragma: no-cache");
+header("Expires: 0");
+
+// Si no hay sesión activa, redirigir al login
 if (!isset($_SESSION['logged']) || $_SESSION['logged'] !== true) {
-    echo "<script>alert('Debes iniciar sesión para acceder.'); window.location.href = 'login.php';</script>";
+    header("Location: login.php");
     exit;
 }
-session_regenerate_id(true); // Seguridad: prevenir secuestro de sesión
 ?>
 <!DOCTYPE html>
 <html lang="es">

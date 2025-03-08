@@ -69,26 +69,26 @@ require_once "db.php"; // Incluir la conexión a la base de datos
         $parametros = [];
 
         if (!empty($_REQUEST['factura'])) {
-            $condiciones[] = "f.numero = :factura";
+            $condiciones[] = "f.numero_factura = :factura";
             $parametros[':factura'] = $_REQUEST['factura'];
         }
 
         if (!empty($_REQUEST['fecha'])) {
             $fecha = DateTime::createFromFormat("d/m/Y", $_REQUEST['fecha']);
             if ($fecha) {
-                $fechaems = $fecha->format("Y-m-d");
-                $condiciones[] = "f.fechaems = :fecha";
-                $parametros[':fecha'] = $fechaems;
+                $fecha_emision = $fecha->format("Y-m-d");
+                $condiciones[] = "f.fecha_emision = :fecha";
+                $parametros[':fecha'] = $fecha_emision;
             }
         }
 
         if (!empty($_REQUEST['cliente'])) {
-            $condiciones[] = "f.codcli = :cliente";
+            $condiciones[] = "f.cod_cliente = :cliente";
             $parametros[':cliente'] = $_REQUEST['cliente'];
         }
 
         if (!empty($_REQUEST['monto'])) {
-            $condiciones[] = "f.monto = :monto";
+            $condiciones[] = "f.valor_factura = :monto";
             $parametros[':monto'] = $_REQUEST['monto'];
         }
 
@@ -98,31 +98,36 @@ require_once "db.php"; // Incluir la conexión a la base de datos
         }
 
         // Construcción de la consulta
-        $query = "SELECT f.numero, f.fechaems, f.monto, f.fechacre, f.codcli, c.razonsoc 
-                  FROM facturas f 
-                  INNER JOIN clientes c ON f.codcli = c.codcli 
+        $query = "SELECT f.numero_factura, f.concepto, f.fecha_emision, f.valor_factura, f.fecha_creacion, 
+                         c.razon_social AS cliente, s.razon_social AS sucursal
+                  FROM facturas f
+                  INNER JOIN clientes c ON f.cod_cliente = c.cod_cliente
+                  INNER JOIN sucursal s ON f.cod_cia = s.cod_cia
                   WHERE " . implode(" AND ", $condiciones);
 
-        $stmt = $conexion->prepare($query);
+        $stmt = $pdo->prepare($query);
         $stmt->execute($parametros);
 
         if ($stmt->rowCount() > 0) {
             echo "<table>";
             echo "<tr>
-                    <th>Código</th>
-                    <th>Razón Social</th>
+                    <th>Cliente</th>
+                    <th>Sucursal</th>
                     <th>Número de Factura</th>
-                    <th>Fecha</th>
+                    <th>Fecha Emisión</th>
+                    <th>Descripción</th>
                     <th>Monto Bs.</th>
                   </tr>";
 
             while ($reg = $stmt->fetch()) {
                 echo "<tr>";
-                echo "<td>" . htmlspecialchars($reg['codcli']) . "</td>";
-                echo "<td>" . htmlspecialchars($reg['razonsoc']) . "</td>";
-                echo "<td>" . htmlspecialchars($reg['numero']) . "</td>";
-                echo "<td>" . htmlspecialchars($reg['fechaems']) . "</td>";
-                echo "<td align='right'>" . number_format($reg['monto'], 2, ',', '.') . "</td>";
+                echo "<td>" . htmlspecialchars($reg['cliente']) . "</td>";
+                echo "<td>" . htmlspecialchars($reg['sucursal']) . "</td>";
+                echo "<td>" . htmlspecialchars($reg['numero_factura']) . "</td>";
+                echo "<td>" . htmlspecialchars($reg['fecha_emision']) . "</td>";
+                echo "<td style='text-align:left; max-width: 250px; overflow:hidden; text-overflow: ellipsis; white-space: nowrap;'>" 
+                    . htmlspecialchars($reg['concepto']) . "</td>";
+                echo "<td align='right'>" . number_format($reg['valor_factura'], 2, ',', '.') . "</td>";
                 echo "</tr>";
             }
             echo "</table>";
@@ -130,7 +135,7 @@ require_once "db.php"; // Incluir la conexión a la base de datos
             echo "<p>No se encontraron facturas con los criterios ingresados.</p>";
         }
     } catch (PDOException $e) {
-        echo "<p>Error en la consulta: " . $e->getMessage() . "</p>";
+        echo "<p>Error en la consulta: " . htmlspecialchars($e->getMessage()) . "</p>";
     }
     ?>
 

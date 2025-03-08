@@ -1,119 +1,241 @@
+<?php
+require 'db.php'; // Conectar a la base de datos
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="utf-8">
-    <title>Sistema Administrativo AFTP - Menú Principal</title>
-    <link href="estilos.css" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Administrativo AFTP - Sucursales</title>
+
+    <!-- Estilos mejorados -->
     <style>
-        #apDiv1 { position: absolute; width: 1276px; height: 209px; z-index: 1; left: 4px; top: 7px; }
-        #apDiv2 { position: absolute; width: 1275px; height: 396px; z-index: 2; left: 5px; top: 219px; }
-        #apDivInicio { position: absolute; width: 117px; height: 28px; z-index: 3; left: 295px; top: 21px; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f4f4f4;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .titulo {
+            text-align: center;
+            background: #007bff;
+            color: white;
+            padding: 15px;
+            border-radius: 8px 8px 0 0;
+            margin-bottom: 20px;
+        }
+
+        .menu {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+
+        .menu a {
+            text-decoration: none;
+            background-color: #28a745;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .menu a:hover {
+            background: #218838;
+        }
+
+        .tab-container {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            background: #007bff;
+            color: white;
+            width: 150px;
+            text-align: center;
+        }
+
+        .tab:hover {
+            background: #0056b3;
+        }
+
+        .content {
+            display: none;
+            padding: 20px;
+            background: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .active {
+            display: block;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            background: #28a745;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px; /* Separación entre dirección y botón */
+        }
+
+        button:hover {
+            background: #218838;
+        }
+
+        /* Estilo especial para el botón de impresión */
+        .print-btn {
+            background: #17a2b8;
+            margin-bottom: 15px;
+        }
+
+        .print-btn:hover {
+            background: #138496;
+        }
     </style>
-    
-    <link href="SpryAssets/SpryValidationTextField.css" rel="stylesheet" type="text/css">
-    <link href="SpryAssets/SpryValidationTextarea.css" rel="stylesheet" type="text/css">
-    <link href="SpryAssets/SpryTabbedPanels.css" rel="stylesheet" type="text/css">
-    <link href="SpryAssets/SpryValidationConfirm.css" rel="stylesheet" type="text/css">
-
-    <script src="SpryAssets/SpryValidationTextField.js"></script>
-    <script src="SpryAssets/SpryValidationTextarea.js"></script>
-    <script src="SpryAssets/SpryTabbedPanels.js"></script>
-    <script src="SpryAssets/SpryValidationConfirm.js"></script>
 </head>
-    
+
 <body>
-    <div class="titulo" id="apDiv1">
-        <p><img src="LogoVeramedWEB.jpg" width="293" height="119"></p>
-        <p>Sistema de Control de Archivo - Compañías</p>
-        <div id="apDivInicio"><a href="index.php" title="Ir al Menú Inicio">Menú Inicio</a></div>
-    </div>
+    <div class="container">
+        <!-- Título -->
+        <div class="titulo">
+            <h2>Sistema de Control de Archivo - Sucursales</h2>
+        </div>
 
-    <div id="apDiv2">
-        <div id="TabbedPanels1" class="TabbedPanels">
-            <ul class="TabbedPanelsTabGroup">
-                <li class="TabbedPanelsTab" tabindex="0">Datos Iniciales</li>
-                <li class="TabbedPanelsTab" tabindex="0">Listado</li>
-            </ul>
-            <div class="TabbedPanelsContentGroup">
-                <div class="TabbedPanelsContent">
-                    <p>Creación de Compañías</p>
-                    <form name="form1" method="post" action="cia01valida.php">
-                        <label for="codigo">Código</label>
-                        <span id="sprytextfield1">
-                            <input name="codigo" type="text" id="codigo" size="6" maxlength="6">
-                            <span class="textfieldRequiredMsg">Se necesita un valor.</span>
-                        </span>
+        <!-- Menú -->
+        <div class="menu">
+            <a href="index.php">Menú Inicio</a>
+        </div>
 
-                        <label for="razonsoc">Razón Social</label>
-                        <span id="sprytextfield2">
-                            <input name="razonsoc" type="text" id="razonsoc" size="100" maxlength="100">
-                            <span class="textfieldRequiredMsg">Se necesita un valor.</span>
-                        </span>
+        <!-- Pestañas -->
+        <div class="tab-container">
+            <div class="tab" onclick="openTab('crear')">Nueva Sucursal</div>
+            <div class="tab" onclick="openTab('listado')">Listado</div>
+        </div>
 
-                        <p>
-                            <label for="rif">R.I.F</label>
-                            <span id="sprytextfield3">
-                                <input name="rif" type="text" id="rif" size="20" maxlength="20">
-                                <span class="textfieldRequiredMsg">Se necesita un valor.</span>
-                            </span>
-                        </p>
+        <!-- Formulario de creación -->
+        <div id="crear" class="content active">
+            <h3>Registrar Sucursal</h3>
+            <form method="post" action="cia01valida.php">
+                <label for="cod_sucursal"><b>Código Sucursal</b></label>
+                <input type="text" name="cod_sucursal" id="cod_sucursal" maxlength="6" required>
 
-                        <p>
-                            <label for="direccion">Dirección Fiscal</label>
-                            <span id="sprytextarea1">
-                                <textarea name="direccion" id="direccion" cols="120" rows="5"></textarea>
-                                <span class="textareaRequiredMsg">Se necesita un valor.</span>
-                            </span>
-                        </p>
+                <label for="razon_social"><b>Razón Social</b></label>
+                <input type="text" name="razon_social" id="razon_social" maxlength="100" required>
 
-                        <p><input type="submit" id="insertar" value="Insertar"></p>
-                    </form>
-                </div>
+                <label for="nit"><b>NIT</b></label>
+                <input type="text" name="nit" id="nit" maxlength="20" required>
 
-                <div class="TabbedPanelsContent">
-                    <p>Listado de Compañías</p>
+                <label for="direccion_proveedor"><b>Dirección</b></label>
+                <textarea name="direccion_proveedor" id="direccion_proveedor" rows="3" required></textarea>
 
-                    <?php
-                        require 'db.php'; // Incluir la conexión a la base de datos
+                <button type="submit">Registrar</button>
+            </form>
+        </div>
 
-                        try {
-                            // Consulta de compañías
-                            $stmt = $pdo->prepare("SELECT codigo, razonsoc, rif FROM compania");
-                            $stmt->execute();
-                            $companias = $stmt->fetchAll();
+        <!-- Listado de sucursales -->
+        <div id="listado" class="content">
+            <h3>Listado de Sucursales</h3>
+            
+            <!-- Botón para imprimir -->
+            <button onclick="printTable()" class="print-btn">🖨️ Imprimir Listado</button>
 
-                            // Mostrar tabla solo si hay datos
-                            if (count($companias) > 0) {
-                                echo "<table border='1'>";
-                                echo "<tr><th>Código</th><th>Razón Social</th><th>RIF</th></tr>";
+            <div id="printArea">
+                <?php
+                try {
+                    // Consulta de sucursales
+                    $stmt = $pdo->query("SELECT cod_sucursal, razon_social, nit FROM sucursal ORDER BY fecha_ingreso DESC");
 
-                                foreach ($companias as $compania) {
-                                    echo "<tr>";
-                                    echo "<td>" . htmlspecialchars($compania['codigo']) . "</td>";
-                                    echo "<td>" . htmlspecialchars($compania['razonsoc']) . "</td>";
-                                    echo "<td>" . htmlspecialchars($compania['rif']) . "</td>";
-                                    echo "</tr>";
-                                }
+                    if ($stmt->rowCount() > 0) {
+                        echo "<table>";
+                        echo "<tr><th>Código</th><th>Razón Social</th><th>NIT</th></tr>";
 
-                                echo "</table>";
-                            } else {
-                                echo "<p>No hay compañías registradas.</p>";
-                            }
-                        } catch (PDOException $e) {
-                            echo "<p>Error al cargar compañías: " . htmlspecialchars($e->getMessage()) . "</p>";
+                        while ($reg = $stmt->fetch()) {
+                            echo "<tr>";
+                            echo "<td>" . htmlspecialchars($reg['cod_sucursal']) . "</td>";
+                            echo "<td>" . htmlspecialchars($reg['razon_social']) . "</td>";
+                            echo "<td>" . htmlspecialchars($reg['nit']) . "</td>";
+                            echo "</tr>";
                         }
-                    ?>
-                </div>
+
+                        echo "</table>";
+                    } else {
+                        echo "<p>No hay sucursales registradas.</p>";
+                    }
+                } catch (PDOException $e) {
+                    echo "<p>Error en la consulta: " . htmlspecialchars($e->getMessage()) . "</p>";
+                }
+                ?>
             </div>
-        </div> 
+        </div>
     </div>
 
+    <!-- Script para manejar las pestañas -->
     <script>
-        var TabbedPanels1 = new Spry.Widget.TabbedPanels("TabbedPanels1");
-        var sprytextfield1 = new Spry.Widget.ValidationTextField("sprytextfield1");
-        var sprytextfield2 = new Spry.Widget.ValidationTextField("sprytextfield2");
-        var sprytextfield3 = new Spry.Widget.ValidationTextField("sprytextfield3");
-        var sprytextarea1 = new Spry.Widget.ValidationTextarea("sprytextarea1");
+        function openTab(tabId) {
+            document.querySelectorAll(".content").forEach(el => el.classList.remove("active"));
+            document.getElementById(tabId).classList.add("active");
+        }
+
+        // Función para imprimir solo la tabla
+        function printTable() {
+            var content = document.getElementById("printArea").innerHTML;
+            var originalContent = document.body.innerHTML;
+
+            document.body.innerHTML = content;
+            window.print();
+            document.body.innerHTML = originalContent;
+        }
     </script>
 </body>
 </html>

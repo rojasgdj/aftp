@@ -1,164 +1,265 @@
+<?php
+require 'db.php'; // Conectar a la base de datos
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema Administrativo AFTP - Ingreso de Facturas</title>
-    <link href="estilos.css" rel="stylesheet" type="text/css">
+
     <style>
-        #apDiv1 { position: absolute; width: 1276px; height: 208px; z-index: 1; left: 4px; top: 7px; }
-        #apDiv2 { position: absolute; width: 1275px; height: 396px; z-index: 2; left: 6px; top: 225px; }
-        #apDiv3 { position: absolute; width: 178px; height: 36px; z-index: 3; left: 297px; top: 19px; }
-    </style>
-
-    <script>
-        function asignacli() {
-            var codigo = document.getElementById('listacli').value;
-            document.getElementById('cliente').value = codigo;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
         }
-    </script>
 
-    <link href="SpryAssets/SpryTabbedPanels.css" rel="stylesheet">
-    <link href="SpryAssets/SpryValidationTextField.css" rel="stylesheet">
-    <link href="SpryAssets/SpryValidationTextarea.css" rel="stylesheet">
-    <script src="SpryAssets/SpryTabbedPanels.js"></script>
-    <script src="SpryAssets/SpryValidationTextField.js"></script>
-    <script src="SpryAssets/SpryValidationTextarea.js"></script>
+        body {
+            background-color: #f4f4f4;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .titulo {
+            text-align: center;
+            background: #007bff;
+            color: white;
+            padding: 15px;
+            border-radius: 8px 8px 0 0;
+            margin-bottom: 20px;
+        }
+
+        .menu {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+
+        .menu a {
+            text-decoration: none;
+            background-color: #28a745;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .menu a:hover {
+            background: #218838;
+        }
+
+        .tab-container {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            background: #007bff;
+            color: white;
+            width: 150px;
+            text-align: center;
+        }
+
+        .tab:hover {
+            background: #0056b3;
+        }
+
+        .content {
+            display: none;
+            padding: 20px;
+            background: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .active {
+            display: block;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            background: #28a745;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        button:hover {
+            background: #218838;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+        }
+
+        td {
+            padding: 8px;
+            text-align: center;
+        }
+
+        /* Limitar la descripción para evitar desbordes */
+        .descripcion {
+            text-align: left;
+            max-width: 250px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    </style>
 </head>
-    
+
 <body>
-    <div class="titulo" id="apDiv1">
-        <p><img src="LogoVeramedWEB.jpg" width="293" height="119"></p>
-        <p>Sistema de Control de Archivo - Ingreso de Facturas</p>
-        <div id="apDiv3"><a href="index.php" title="Ir a Menú Inicio">Menú Inicio</a></div>
+    <div class="container">
+        <!-- Título -->
+        <div class="titulo">
+            <h2>Sistema de Control de Archivo - Ingreso de Facturas</h2>
+        </div>
+
+        <!-- Menú -->
+        <div class="menu">
+            <a href="index.php">Menú Inicio</a>
+        </div>
+
+        <!-- Pestañas -->
+        <div class="tab-container">
+            <div class="tab" onclick="openTab('crear')">Nueva Factura</div>
+            <div class="tab" onclick="openTab('listado')">Listado</div>
+        </div>
+
+        <!-- Formulario de creación -->
+        <div id="crear" class="content active">
+            <h3>Registrar Factura</h3>
+            <form id="facturaForm" method="post" action="factura01valida.php">
+                <label for="factura"><b>Número de Factura</b></label>
+                <input type="text" name="factura" id="factura" required>
+
+                <label for="concepto"><b>Concepto</b></label>
+                <textarea name="concepto" id="concepto" rows="3" required></textarea>
+
+                <label for="fecha"><b>Fecha de Emisión</b></label>
+                <input type="date" name="fecha" id="fecha" required>
+
+                <label for="cliente"><b>Cliente</b></label>
+                <select name="cliente" id="cliente" required>
+                    <option value="">Seleccione un cliente</option>
+                    <?php
+                    try {
+                        $stmt = $pdo->query("SELECT cod_cliente, razon_social FROM clientes");
+                        while ($cliente = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                            echo "<option value='" . htmlspecialchars($cliente['cod_cliente']) . "'>" . htmlspecialchars($cliente['razon_social']) . "</option>";
+                        }
+                    } catch (PDOException $e) {
+                        echo "<p>Error: " . htmlspecialchars($e->getMessage()) . "</p>";
+                    }
+                    ?>
+                </select>
+
+                <label for="cod_cia"><b>Sucursal</b></label>
+                <select name="cod_cia" id="cod_cia" required>
+                    <option value="">Seleccione una sucursal</option>
+                    <?php
+                    try {
+                        $stmt = $pdo->query("SELECT cod_cia, razon_social FROM sucursal");
+                        while ($sucursal = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                            echo "<option value='" . htmlspecialchars($sucursal['cod_cia']) . "'>" . htmlspecialchars($sucursal['razon_social']) . "</option>";
+                        }
+                    } catch (PDOException $e) {
+                        echo "<p>Error: " . htmlspecialchars($e->getMessage()) . "</p>";
+                    }
+                    ?>
+                </select>
+
+                <label for="monto"><b>Monto Bs.</b></label>
+                <input type="number" name="monto" id="monto" step="0.01" min="0" required>
+
+                <button type="submit">Registrar</button>
+            </form>
+        </div>
+
+        <!-- Listado de Facturas -->
+        <div id="listado" class="content">
+            <h3>Últimas Facturas Registradas</h3>
+            <?php
+            try {
+                $stmt = $pdo->prepare("
+                    SELECT f.numero_factura, f.concepto, f.fecha_emision, f.valor_factura, f.fecha_creacion, f.cod_cliente, f.cod_cia, 
+                        c.razon_social AS cliente, s.razon_social AS sucursal 
+                    FROM facturas f
+                    INNER JOIN clientes c ON f.cod_cliente = c.cod_cliente
+                    INNER JOIN sucursal s ON f.cod_cia = s.cod_cia
+                    ORDER BY f.fecha_creacion DESC
+                    LIMIT 10
+                ");
+                $stmt->execute();
+                $facturas = $stmt->fetchAll();
+
+                if (count($facturas) > 0) {
+                    echo "<table>";
+                    echo "<tr><th>Número</th><th>Cliente</th><th>Sucursal</th><th>Fecha</th><th>Descripción</th><th>Monto</th></tr>";
+
+                    foreach ($facturas as $factura) {
+                        echo "<tr>";
+                        echo "<td>" . htmlspecialchars($factura['numero_factura']) . "</td>";
+                        echo "<td>" . htmlspecialchars($factura['cliente']) . "</td>";
+                        echo "<td>" . htmlspecialchars($factura['sucursal']) . "</td>";
+                        echo "<td>" . htmlspecialchars($factura['fecha_emision']) . "</td>";
+                        echo "<td class='descripcion'>" . htmlspecialchars($factura['concepto']) . "</td>";
+                        echo "<td align='right'>" . number_format($factura['valor_factura'], 2, ',', '.') . "</td>";
+                        echo "</tr>";
+                    }
+
+                    echo "</table>";
+                } else {
+                    echo "<p>No hay facturas registradas.</p>";
+                }
+            } catch (PDOException $e) {
+                echo "<p>Error en la consulta: " . htmlspecialchars($e->getMessage()) . "</p>";
+            }
+            ?>
+        </div>
     </div>
 
-    <form name="form1" method="post" action="factura01valida.php">
-        <div id="apDiv2">
-            <div id="TabbedPanels1" class="TabbedPanels">
-                <ul class="TabbedPanelsTabGroup">
-                    <li class="TabbedPanelsTab" tabindex="0">Datos</li>
-                    <li class="TabbedPanelsTab" tabindex="0">Últimas Facturas Registradas</li>
-                </ul>
-                <div class="TabbedPanelsContentGroup">
-                    <div class="TabbedPanelsContent">
-                        <table width="1003" height="210" border="0">
-                            <tr>
-                                <td width="175">Número de Factura</td>
-                                <td width="301">
-                                    <span id="sprytextfield1">
-                                        <input type="text" name="factura" id="factura">
-                                        <span class="textfieldRequiredMsg">Se necesita un valor.</span>
-                                    </span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Concepto</td>
-                                <td>
-                                    <span id="sprytextarea1">
-                                        <textarea name="concepto" id="concepto" cols="45" rows="5"></textarea>
-                                        <span class="textareaRequiredMsg">Se necesita un valor.</span>
-                                    </span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Fecha</td>
-                                <td>
-                                    <span id="sprytextfield2">
-                                        <input type="text" name="fecha" id="fecha">
-                                        <span class="textfieldRequiredMsg">Se necesita un valor.</span>
-                                    </span> (dd/mm/aaaa)
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Cliente</td>
-                                <td>
-                                    <span id="sprytextfield3">
-                                        <input type="text" name="cliente" id="cliente">
-                                        <span class="textfieldRequiredMsg">Se necesita un valor.</span>
-                                    </span>
-                                    <select name="listacli" id="listacli" onChange="asignacli()">
-                                        <?php
-                                            require 'db.php'; // Conexión centralizada
-
-                                            try {
-                                                $stmt = $pdo->prepare("SELECT codcli, razonsoc FROM clientes");
-                                                $stmt->execute();
-                                                $clientes = $stmt->fetchAll();
-
-                                                foreach ($clientes as $cliente) {
-                                                    echo "<option value='" . htmlspecialchars($cliente['codcli']) . "'>" 
-                                                        . htmlspecialchars($cliente['codcli']) . " - " . htmlspecialchars($cliente['razonsoc']) . "</option>";
-                                                }
-                                            } catch (PDOException $e) {
-                                                die("Error en la conexión: " . htmlspecialchars($e->getMessage()));
-                                            }
-                                        ?>
-                                    </select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Monto Bs.</td>
-                                <td>
-                                    <span id="sprytextfield4">
-                                        <input type="text" name="monto" id="monto">
-                                        <span class="textfieldRequiredMsg">Se necesita un valor.</span>
-                                    </span>
-                                </td>
-                            </tr>
-                        </table>
-                        <p><input type="submit" name="Enviar" id="Enviar" value="Enviar"></p>
-                    </div>
-                    
-                    <div class="TabbedPanelsContent">
-                        <p>Últimas Facturas Registradas</p>
-                        <?php
-                            try {
-                                $stmt = $pdo->prepare("
-                                    SELECT f.numero, f.fechaems, f.monto, f.fechacre, f.codcli, c.razonsoc 
-                                    FROM facturas f
-                                    INNER JOIN clientes c ON f.codcli = c.codcli
-                                    ORDER BY fechacre DESC 
-                                    LIMIT 10
-                                ");
-                                $stmt->execute();
-                                $facturas = $stmt->fetchAll();
-
-                                if (count($facturas) > 0) {
-                                    echo "<table border='1'>";
-                                    echo "<tr><th>Código</th><th>Cliente</th><th>Número de Factura</th><th>Fecha Factura</th><th>Monto Bs.</th></tr>";
-
-                                    foreach ($facturas as $factura) {
-                                        echo "<tr>";
-                                        echo "<td>" . htmlspecialchars($factura['codcli']) . "</td>";
-                                        echo "<td>" . htmlspecialchars($factura['razonsoc']) . "</td>";
-                                        echo "<td>" . htmlspecialchars($factura['numero']) . "</td>";
-                                        echo "<td>" . htmlspecialchars($factura['fechaems']) . "</td>";
-                                        echo "<td align='right'>" . htmlspecialchars($factura['monto']) . "</td>";
-                                        echo "</tr>";
-                                    }
-
-                                    echo "</table>";
-                                } else {
-                                    echo "<p>No hay facturas registradas.</p>";
-                                }
-
-                            } catch (PDOException $e) {
-                                die("Error en la conexión: " . htmlspecialchars($e->getMessage()));
-                            }
-                        ?>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </form>
-
     <script>
-        var TabbedPanels1 = new Spry.Widget.TabbedPanels("TabbedPanels1");
-        var sprytextfield1 = new Spry.Widget.ValidationTextField("sprytextfield1");
-        var sprytextarea1 = new Spry.Widget.ValidationTextarea("sprytextarea1");
-        var sprytextfield2 = new Spry.Widget.ValidationTextField("sprytextfield2", "date", {format:"dd/mm/yyyy"});
-        var sprytextfield3 = new Spry.Widget.ValidationTextField("sprytextfield3", "integer");
-        var sprytextfield4 = new Spry.Widget.ValidationTextField("sprytextfield4", "currency", {minValue:1});
+        function openTab(tabId) {
+            document.querySelectorAll(".content").forEach(el => el.classList.remove("active"));
+            document.getElementById(tabId).classList.add("active");
+        }
     </script>
 </body>
 </html>

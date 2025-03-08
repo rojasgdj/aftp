@@ -1,3 +1,17 @@
+<?php
+session_start();
+
+// Evitar que el navegador almacene caché para evitar acceso a páginas protegidas después del logout
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Pragma: no-cache");
+header("Expires: 0");
+
+// Si el usuario ya está autenticado, lo redirige al index
+if (isset($_SESSION['logged']) && $_SESSION['logged'] === true) {
+    header("Location: index.php");
+    exit;
+}
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -10,9 +24,9 @@
   <!-- Estilos -->
   <link href="clases.css" rel="stylesheet">
   <link href="Public/css/estilos.css" rel="stylesheet">
+  <link href="Public/css/bg.jpg" rel="stylesheet">
 
   <style>
-    /* Estilos generales */
     body {
       font-family: Arial, sans-serif;
       background-color: #f4f4f4;
@@ -67,49 +81,41 @@
       font-size: 0.9rem;
       color: #666;
     }
-    table {
-      width: 100%;
-    }
-    .error-msg {
-      color: red;
-      font-size: 0.85rem;
-      display: none;
-    }
   </style>
 </head>
 <body>
 
   <div id="container">
-    <form id="loginForm" method="post" action="iniciasesion.php">
-      <p><img src="LogoVeramedWEB.jpg" alt="Logo de Veramed" width="293" height="119"></p>
-
-      <div class="block-border">
-        <p><strong>Sistema de Control de Archivo - Inicio de sesión</strong></p>
-        <table>
-          <tr>
-            <td class="nom_campos"><label for="cedula">Cédula</label></td>
-            <td class="dat_campos">
-              <input type="number" name="cedula" id="cedula" placeholder="Ingrese su cédula" required min="1">
-              <span class="error-msg" id="cedulaError">Debe ingresar una cédula válida.</span>
-            </td>
-          </tr>
-          <tr>
-            <td class="nom_campos"><label for="clave1">Contraseña</label></td>
-            <td class="dat_campos">
-              <input type="password" name="clave1" id="clave1" placeholder="Ingrese su clave" required minlength="4" autocomplete="off">
-              <span class="error-msg" id="claveError">Debe ingresar una contraseña válida (mínimo 4 caracteres).</span>
-            </td>
-          </tr>
-          <tr>
-            <td class="nom_campos"></td>
-            <td class="dat_campos">
-              <input type="submit" name="enviar" id="enviar" value="Iniciar sesión">
-            </td>
-          </tr>
-        </table>
-      </div>
-
-      <p><a href="registrousuario.php">Registrarse</a> | <a href="AFTP.pdf">Manual de uso</a></p>
+    <form id="loginForm" method="post" action="iniciasesion.php" autocomplete="off">
+      <center>
+        <p><img src="LogoVeramedWEB.jpg" alt="Logo de Veramed" width="293" height="119"></p>
+        <p>&nbsp;</p>
+        <div class="block-border">
+          <p><strong>Sistema de Control de Archivo - Inicio de sesión</strong></p>
+          <table>
+            <tr>
+              <td class="nom_campos"><label for="cedula"><b>Cédula</b></label></td>
+              <td class="dat_campos">
+                <input type="number" name="cedula" id="cedula" placeholder="Cédula" required min="1" autocomplete="off">
+              </td>
+            </tr>
+            <tr>
+              <td class="nom_campos"><label for="clave1">Contraseña</label></td>
+              <td class="dat_campos">
+                <input type="password" name="clave1" id="clave1" placeholder="Clave" required minlength="4" autocomplete="off">
+              </td>
+            </tr>
+            <tr>
+              <td class="nom_campos">&nbsp;</td>
+              <td class="dat_campos">
+                <input type="submit" name="enviar" id="enviar" value="Iniciar sesión">
+              </td>
+            </tr>
+          </table>
+        </div>
+        <p><a href="registrousuario.php">Registrarse</a></p>
+        <p><a href="AFTP.pdf">Manual de uso</a></p>
+      </center>
     </form>
 
     <div id="footer">
@@ -117,35 +123,16 @@
     </div>
   </div>
 
-  <!-- Validación con JavaScript -->
+  <!-- JavaScript para mejorar seguridad -->
   <script>
-    document.getElementById("loginForm").addEventListener("submit", function (event) {
-      let cedula = document.getElementById("cedula").value.trim();
-      let clave = document.getElementById("clave1").value.trim();
-      let cedulaError = document.getElementById("cedulaError");
-      let claveError = document.getElementById("claveError");
-      let valid = true;
+    window.onload = function() {
+      document.getElementById("cedula").value = "";
+      document.getElementById("clave1").value = "";
+    };
 
-      // Validar cédula
-      if (cedula === "" || isNaN(cedula) || cedula < 1) {
-        cedulaError.style.display = "block";
-        valid = false;
-      } else {
-        cedulaError.style.display = "none";
-      }
-
-      // Validar contraseña
-      if (clave.length < 4) {
-        claveError.style.display = "block";
-        valid = false;
-      } else {
-        claveError.style.display = "none";
-      }
-
-      // Si hay errores, detener el envío del formulario
-      if (!valid) {
-        event.preventDefault();
-      }
+    // Script de copyright
+    document.addEventListener('DOMContentLoaded', function () {
+      console.log('NOTIFICACIÓN de Copyright© ["2024"] ["Bits Software"]...');
     });
   </script>
 

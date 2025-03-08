@@ -1,18 +1,12 @@
 <?php
 session_start();
 
-// Si no hay sesión activa, redirigir al login de inmediato
-if (!isset($_SESSION['logged'])) {
-    header("Location: login.php");
-    exit;
-}
-
-// Evitar que el navegador almacene caché (previene volver atrás tras logout)
-header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
-header("Cache-Control: post-check=0, pre-check=0", false);
+// Evitar caché para prevenir volver atrás
+header("Cache-Control: no-cache, no-store, must-revalidate");
 header("Pragma: no-cache");
+header("Expires: 0");
 
-// Destruir la sesión si está activa
+// Destruir completamente la sesión
 session_unset();
 session_destroy();
 
@@ -25,8 +19,9 @@ if (ini_get("session.use_cookies")) {
     );
 }
 
-// Redirigir al usuario al login con mensaje opcional
-header("Location: login.php?logout=success");
+// Redirigir al login con JavaScript para invalidar historial del navegador
+echo "<script>
+    window.location.replace('login.php');
+</script>";
 exit;
 ?>
-

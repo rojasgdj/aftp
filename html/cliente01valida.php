@@ -1,52 +1,68 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="utf-8">
-    <title>Validación de Datos</title>
-</head>
-<body>
-
 <?php
-require 'db.php'; // Incluir la conexión a la base de datos
+require 'db.php'; // Conectar a la base de datos
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Recibir datos y limpiar entrada
-    $rif = htmlspecialchars(trim($_POST['rif']));
-    $razonsoc = htmlspecialchars(trim($_POST['razonsoc']));
-    $tel = htmlspecialchars(trim($_POST['telefono']));
-    $dir = htmlspecialchars(trim($_POST['direccion']));
-    $persona = htmlspecialchars(trim($_POST['persona']));
-    $hoy = date("Ymd");
+    // Recibir y limpiar datos
+    $nit = htmlspecialchars(trim($_POST['nit']));
+    $razon_social = htmlspecialchars(trim($_POST['razon_social']));
+    $direccion = htmlspecialchars(trim($_POST['direccion']));
+    $telefono = htmlspecialchars(trim($_POST['telefono']));
+    $numero_contacto = htmlspecialchars(trim($_POST['numero_contacto']));
+    $status_cliente = "Activo"; // Por defecto, nuevo cliente está activo
+    $fecha_creacion = date("Y-m-d H:i:s"); // Fecha y hora actual
 
     try {
-        // Preparar consulta para evitar inyección SQL
-        $stmt = $pdo->prepare("INSERT INTO clientes (rif, razonsoc, telefono, direccion, contacto, status, fechacre) 
-                               VALUES (:rif, :razonsoc, :telefono, :direccion, :contacto, 'ACTIVO', :fechacre)");
+        // Verificar si el NIT ya existe antes de insertar
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM clientes WHERE nit = :nit");
+        $stmt->bindParam(':nit', $nit, PDO::PARAM_STR);
+        $stmt->execute();
+        $existe = $stmt->fetchColumn();
 
-        // Ejecutar consulta con parámetros
+        if ($existe > 0) {
+            // Si el NIT ya está registrado, mostrar una alerta en el formulario
+            echo "<script>
+                    alert('❌ Error: El NIT ingresado ya está registrado.');
+                    window.history.back(); // Regresar al formulario
+                  </script>";
+            exit;
+        }
+
+        // Preparar consulta para evitar inyección SQL
+        $stmt = $pdo->prepare("INSERT INTO clientes (nit, razon_social, direccion, telefono, numero_contacto, status_cliente, fecha_creacion) 
+                               VALUES (:nit, :razon_social, :direccion, :telefono, :numero_contacto, :status_cliente, :fecha_creacion)");
+
+        // Ejecutar consulta
         if ($stmt->execute([
-            ':rif' => $rif,
-            ':razonsoc' => $razonsoc,
-            ':telefono' => $tel,
-            ':direccion' => $dir,
-            ':contacto' => $persona,
-            ':fechacre' => $hoy
+            ':nit' => $nit,
+            ':razon_social' => $razon_social,
+            ':direccion' => $direccion,
+            ':telefono' => $telefono,
+            ':numero_contacto' => $numero_contacto,
+            ':status_cliente' => $status_cliente,
+            ':fecha_creacion' => $fecha_creacion
         ])) {
             echo "<script>
-                    alert('Los datos fueron guardados con éxito.');
-                    window.location.href = 'clientes01.php';
+                    alert('✅ Cliente registrado con éxito.');
+                    window.location.href = 'clientes01.php'; // Redirigir al registro del cliente
                   </script>";
+            exit;
         } else {
-            echo "<p>Error al guardar los datos.</p>";
+            echo "<script>
+                    alert('⚠️ Error al registrar el cliente.');
+                    window.history.back();
+                  </script>";
         }
 
     } catch (PDOException $e) {
-        echo "<p>Error en la conexión: " . htmlspecialchars($e->getMessage()) . "</p>";
+        echo "<script>
+                alert('⚠️ Error en la conexión: " . addslashes($e->getMessage()) . "');
+                window.history.back();
+              </script>";
     }
 } else {
-    echo "<p>Método de acceso no permitido.</p>";
+    echo "<script>
+            alert('⚠️ Método de acceso no permitido.');
+            window.history.back();
+          </script>";
 }
 ?>
-
-</body>
-</html>

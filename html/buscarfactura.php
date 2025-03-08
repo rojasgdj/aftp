@@ -1,105 +1,141 @@
+<?php
+require 'db.php'; // Conectar a la base de datos
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="utf-8">
-    <title>Sistema de Biblioteca IUTV</title>
-    <link href="estilos.css" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Administrativo AFTP - Búsqueda de Factura</title>
+
     <style>
-        #apDiv1 { position: absolute; width: 1276px; height: 208px; z-index: 1; left: 4px; top: 7px; }
-        #apDiv2 { position: absolute; width: 1275px; height: 396px; z-index: 2; left: 6px; top: 225px; }
-        #apDiv3 { position: absolute; width: 178px; height: 36px; z-index: 3; left: 296px; top: 22px; }
-    </style>
-    <script>
-        function asignacli() {
-            var codigo = document.getElementById('listacli').value;
-            document.getElementById('cliente').value = codigo;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
         }
-    </script>  
-    <link href="SpryAssets/SpryValidationTextField.css" rel="stylesheet" type="text/css">
-    <script src="SpryAssets/SpryMenuBar.js"></script>
-    <script src="SpryAssets/SpryTabbedPanels.js"></script>
-    <script src="SpryAssets/SpryValidationTextField.js"></script>
+
+        body {
+            background-color: #f4f4f4;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .titulo {
+            text-align: center;
+            background: #007bff;
+            color: white;
+            padding: 15px;
+            border-radius: 8px 8px 0 0;
+            margin-bottom: 20px;
+        }
+
+        .menu {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+
+        .menu a {
+            text-decoration: none;
+            background-color: #28a745;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .menu a:hover {
+            background: #218838;
+        }
+
+        form {
+            padding: 20px;
+            background: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+            text-align: left;
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            background: #007bff;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
 </head>
-    
-<body align="center">
-    <div class="titulo" id="apDiv1">
-        <p><img src="LogoVeramedWEB.jpg" width="293" height="119"></p>
-        <p>Sistema de Control de Archivo - Búsqueda de Factura</p>
-        <div id="apDiv3"><a href="index.php" title="Ir a Menú Inicio">Menú Inicio</a></div>
-    </div>
 
-    <form name="form1" method="post" action="resulbusqfact.php">
-        <div id="apDiv2">
-            <div id="TabbedPanels1" class="TabbedPanels">
-                <ul class="TabbedPanelsTabGroup">
-                    <li class="TabbedPanelsTab" tabindex="0">Coloque uno o varios datos a buscar</li>
-                </ul>
-                <div class="TabbedPanelsContentGroup">
-                    <div class="TabbedPanelsContent">
-                        <table width="1003" height="210" border="1">
-                            <tr>
-                                <td width="175">Número de Factura</td>
-                                <td width="301">
-                                    <span id="sprytextfield1">
-                                        <input type="text" name="factura" id="factura">
-                                        <span class="textfieldInvalidFormatMsg">Formato no válido.</span>
-                                    </span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Fecha</td>
-                                <td>
-                                    <span id="sprytextfield2">
-                                        <input type="text" name="fecha" id="fecha2">
-                                        <span class="textfieldInvalidFormatMsg">Formato no válido.</span>
-                                    </span>
-                                    Formato dd/mm/yyyy
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Cliente</td>
-                                <td>
-                                    <input type="text" name="cliente" id="cliente">
-                                    <select name="listacli" id="listacli" onChange="asignacli()">
-                                        <?php
-                                            require 'db.php'; // Incluir la conexión
-
-                                            try {
-                                                $stmt = $pdo->query("SELECT codcli, razonsoc FROM clientes");
-
-                                                while ($reg = $stmt->fetch()) {
-                                                    $cli = htmlspecialchars($reg['codcli']);
-                                                    $razon = htmlspecialchars($reg['razonsoc']);
-                                                    echo "<option value=\"$cli\">$cli - $razon</option>";
-                                                }
-                                            } catch (PDOException $e) {
-                                                echo "<option>Error al cargar clientes</option>";
-                                            }
-                                        ?>
-                                    </select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Monto Bs.</td>
-                                <td>
-                                    <span id="sprytextfield3">
-                                        <input type="text" name="monto" id="monto2">
-                                        <span class="textfieldInvalidFormatMsg">Formato no válido.</span>
-                                    </span>
-                                </td>
-                            </tr>
-                        </table>
-                        <p><input type="submit" name="Enviar" id="Buscar" value="Buscar"></p>
-                    </div>
-                </div>
-            </div>
+<body>
+    <div class="container">
+        <!-- Título -->
+        <div class="titulo">
+            <h2>Sistema de Control de Archivo - Búsqueda de Factura</h2>
         </div>
-    </form>
 
-    <script>
-        var sprytextfield1 = new Spry.Widget.ValidationTextField("sprytextfield1", "integer", {isRequired:false});
-        var sprytextfield2 = new Spry.Widget.ValidationTextField("sprytextfield2", "date", {format:"dd/mm/yyyy", isRequired:false});
-        var sprytextfield3 = new Spry.Widget.ValidationTextField("sprytextfield3", "currency", {isRequired:false});
-    </script>
+        <!-- Menú -->
+        <div class="menu">
+            <a href="index.php">Menú Inicio</a>
+        </div>
+
+        <!-- Formulario de Búsqueda -->
+        <form name="form1" method="post" action="resulbusqfact.php">
+            <label for="factura">Número de Factura:</label>
+            <input type="text" name="factura" id="factura">
+
+            <label for="fecha">Fecha de Emisión:</label>
+            <input type="date" name="fecha" id="fecha">
+
+            <label for="cliente">Cliente:</label>
+            <select name="cliente" id="cliente">
+                <option value="">Seleccione un cliente</option>
+                <?php
+                try {
+                    $stmt = $pdo->query("SELECT cod_cliente, razon_social FROM clientes");
+                    while ($cliente = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                        echo "<option value='" . htmlspecialchars($cliente['cod_cliente']) . "'>" . htmlspecialchars($cliente['razon_social']) . "</option>";
+                    }
+                } catch (PDOException $e) {
+                    echo "<p>Error: " . htmlspecialchars($e->getMessage()) . "</p>";
+                }
+                ?>
+            </select>
+
+            <label for="monto">Monto Bs.:</label>
+            <input type="number" name="monto" id="monto" step="0.01" min="0">
+
+            <button type="submit">Buscar</button>
+        </form>
+    </div>
 </body>
 </html>
