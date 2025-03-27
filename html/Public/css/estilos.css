@@ -4,6 +4,10 @@ body {
   margin: 0;
   padding: 0;
   background-color: #f4f4f4;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 /* Contenedor principal */
@@ -14,18 +18,16 @@ body {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   max-width: 400px;
   width: 100%;
-  margin: 20px auto; /* Centrar el contenedor */
+  margin: 20px auto;
 }
 
 /* Título */
 .titulo {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 16px;
-  background-color: #6CF;
-  text-align: center;
-  padding: 10px;
-  border-radius: 4px;
+  font-size: 16px !important;
+  background-color: #6CF !important;
+  text-align: center !important;
 }
+
 
 /* Campos del formulario */
 .nom_campos {
@@ -41,10 +43,10 @@ body {
 /* Bloques con borde */
 .block-border {
   margin: 20px 0;
-  border: 5px solid #FFA500;
+  border: 3px solid #FFA500;
   border-radius: 20px 0 20px 0;
   padding: 15px;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5), inset 50px 20px 50px 20px #90EE90;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3), inset 5px 5px 20px rgba(144, 238, 144, 0.6);
 }
 
 /* Inputs y textareas */
@@ -52,11 +54,13 @@ input[type="text"],
 input[type="password"],
 textarea {
   width: 100%;
-  padding: 8px;
+  padding: 10px;
   margin: 5px 0;
   border: 1px solid #ccc;
   border-radius: 4px;
   box-sizing: border-box;
+  font-size: 16px;
+  outline: none;
 }
 
 /* Botón de enviar */
@@ -68,6 +72,7 @@ input[type="submit"] {
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
 }
 
 input[type="submit"]:hover {
@@ -76,7 +81,6 @@ input[type="submit"]:hover {
 
 /* Footer */
 #footer {
-  border: solid 1px #ccc;
   text-align: center;
   margin-top: 20px;
   padding: 10px;
@@ -85,21 +89,20 @@ input[type="submit"]:hover {
 }
 
 /* Enlaces */
-a, a:hover, a:active {
+a {
   text-decoration: none;
-  color: green;
+  color: #007bff;
   font-weight: bold;
+  transition: color 0.3s;
+}
+
+a:hover {
+  color: #0056b3;
 }
 
 /* Estilos responsivos */
 @media (max-width: 600px) {
-  .block-border {
-    margin: 10px 0;
-    padding: 10px;
-  }
-
   #container {
-    margin: 10px;
-    padding: 15px;
+    max-width: 90%;
   }
 }

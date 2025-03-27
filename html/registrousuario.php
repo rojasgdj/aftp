@@ -1,6 +1,19 @@
 <?php
 require_once "db.php"; // Conexión a la base de datos
 
+session_start();
+
+// Evitar caché del navegador
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Pragma: no-cache");
+header("Expires: 0");
+
+// Si el usuario ya está autenticado, lo redirige al index
+if (isset($_SESSION['logged']) && $_SESSION['logged'] === true) {
+    header("Location: index.php");
+    exit;
+}
+
 // Habilitar errores para depuración (eliminar en producción)
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
@@ -67,73 +80,5 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } catch (PDOException $e) {
         echo "<script>alert('Error en la conexión: " . addslashes($e->getMessage()) . "');</script>";
     }
-} else {
-    // Mostrar el formulario de registro si el usuario accede con GET
-    ?>
-    <!DOCTYPE html>
-    <html lang="es">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Registro de Usuario</title>
-        <style>
-            body {
-                font-family: Arial, sans-serif;
-                background-color: #f4f4f4;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                height: 100vh;
-            }
-            .container {
-                background: white;
-                padding: 20px;
-                border-radius: 8px;
-                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-                width: 100%;
-                max-width: 400px;
-                text-align: center;
-            }
-            input {
-                width: 100%;
-                padding: 10px;
-                margin: 5px 0;
-                border: 1px solid #ccc;
-                border-radius: 5px;
-            }
-            button {
-                width: 100%;
-                padding: 10px;
-                background-color: #28a745;
-                color: white;
-                border: none;
-                border-radius: 5px;
-                cursor: pointer;
-            }
-            button:hover {
-                background-color: #218838;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <h2>Registro de Usuario</h2>
-            <form action="registrousuario.php" method="post">
-                <label for="cedula">Cédula:</label>
-                <input type="number" name="cedula" id="cedula" required>
-
-                <label for="clave1">Contraseña:</label>
-                <input type="password" name="clave1" id="clave1" required minlength="4">
-
-                <label for="clave2">Repetir Contraseña:</label>
-                <input type="password" name="clave2" id="clave2" required minlength="4">
-
-                <button type="submit">Registrarse</button>
-            </form>
-            <p><a href="login.php">Volver al inicio</a></p>
-        </div>
-    </body>
-    </html>
-    <?php
 }
 ?>

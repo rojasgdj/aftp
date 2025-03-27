@@ -1,5 +1,5 @@
 <?php
-require_once "db.php"; // Incluir la conexión a la base de datos
+require_once "db.php"; // Conexión a la base de datos
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -7,8 +7,6 @@ require_once "db.php"; // Incluir la conexión a la base de datos
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reporte de Facturas Recibidas</title>
-
-    <link href="estilos.css" rel="stylesheet" type="text/css">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -74,22 +72,16 @@ require_once "db.php"; // Incluir la conexión a la base de datos
         }
 
         if (!empty($_REQUEST['fecha'])) {
-            $fecha = DateTime::createFromFormat("d/m/Y", $_REQUEST['fecha']);
+            $fecha = DateTime::createFromFormat("Y-m-d", $_REQUEST['fecha']);
             if ($fecha) {
-                $fecha_emision = $fecha->format("Y-m-d");
                 $condiciones[] = "f.fecha_emision = :fecha";
-                $parametros[':fecha'] = $fecha_emision;
+                $parametros[':fecha'] = $fecha->format("Y-m-d");
             }
         }
 
-        if (!empty($_REQUEST['cliente'])) {
-            $condiciones[] = "f.cod_cliente = :cliente";
-            $parametros[':cliente'] = $_REQUEST['cliente'];
-        }
-
-        if (!empty($_REQUEST['monto'])) {
-            $condiciones[] = "f.valor_factura = :monto";
-            $parametros[':monto'] = $_REQUEST['monto'];
+        if (!empty($_REQUEST['proveedor'])) {
+            $condiciones[] = "f.cod_proveedor = :proveedor";
+            $parametros[':proveedor'] = $_REQUEST['proveedor'];
         }
 
         if (empty($condiciones)) {
@@ -97,11 +89,11 @@ require_once "db.php"; // Incluir la conexión a la base de datos
             exit;
         }
 
-        // Construcción de la consulta
+        // Consulta SQL
         $query = "SELECT f.numero_factura, f.concepto, f.fecha_emision, f.valor_factura, f.fecha_creacion, 
-                         c.razon_social AS cliente, s.razon_social AS sucursal
+                         p.razon_social AS proveedor, s.razon_social AS sucursal
                   FROM facturas f
-                  INNER JOIN clientes c ON f.cod_cliente = c.cod_cliente
+                  INNER JOIN proveedores p ON f.cod_proveedor = p.cod_proveedor
                   INNER JOIN sucursal s ON f.cod_cia = s.cod_cia
                   WHERE " . implode(" AND ", $condiciones);
 
@@ -111,7 +103,7 @@ require_once "db.php"; // Incluir la conexión a la base de datos
         if ($stmt->rowCount() > 0) {
             echo "<table>";
             echo "<tr>
-                    <th>Cliente</th>
+                    <th>Proveedor</th>
                     <th>Sucursal</th>
                     <th>Número de Factura</th>
                     <th>Fecha Emisión</th>
@@ -119,17 +111,18 @@ require_once "db.php"; // Incluir la conexión a la base de datos
                     <th>Monto Bs.</th>
                   </tr>";
 
-            while ($reg = $stmt->fetch()) {
+            while ($reg = $stmt->fetch(PDO::FETCH_ASSOC)) {
                 echo "<tr>";
-                echo "<td>" . htmlspecialchars($reg['cliente']) . "</td>";
+                echo "<td>" . htmlspecialchars($reg['proveedor']) . "</td>";
                 echo "<td>" . htmlspecialchars($reg['sucursal']) . "</td>";
                 echo "<td>" . htmlspecialchars($reg['numero_factura']) . "</td>";
                 echo "<td>" . htmlspecialchars($reg['fecha_emision']) . "</td>";
-                echo "<td style='text-align:left; max-width: 250px; overflow:hidden; text-overflow: ellipsis; white-space: nowrap;'>" 
+                echo "<td style='text-align:left; max-width: 250px; overflow:hidden; text-overflow: ellipsis; white-space: nowrap;'>"
                     . htmlspecialchars($reg['concepto']) . "</td>";
                 echo "<td align='right'>" . number_format($reg['valor_factura'], 2, ',', '.') . "</td>";
                 echo "</tr>";
             }
+
             echo "</table>";
         } else {
             echo "<p>No se encontraron facturas con los criterios ingresados.</p>";

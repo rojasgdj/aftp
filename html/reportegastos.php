@@ -1,107 +1,146 @@
 <?php
-require_once "db.php"; // Incluir conexión a la base de datos
+session_start();
+session_regenerate_id(true);
+
+// Seguridad de sesión y control de caché
+header("Cache-Control: no-cache, no-store, must-revalidate");
+header("Pragma: no-cache");
+header("Expires: 0");
+
+if (!isset($_SESSION['logged']) || $_SESSION['logged'] !== true) {
+    header("Location: login.php");
+    exit;
+}
+
+require_once "db.php";
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Reporte de Gastos Recibidos</title>
-
-    <link href="estilos.css" rel="stylesheet" type="text/css">
     <style>
-        body {
+        * {
+            box-sizing: border-box;
             font-family: Arial, sans-serif;
+        }
+        body {
             background-color: #f4f4f4;
-            margin: 20px;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
         }
         .container {
-            max-width: 1200px;
+            max-width: 1100px;
             margin: auto;
             background: #fff;
-            padding: 20px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #007bff;
+            margin-bottom: 20px;
         }
         table {
             width: 100%;
             border-collapse: collapse;
-            margin: 20px 0;
-        }
-        table, th, td {
-            border: 1px solid #ddd;
+            margin-top: 15px;
+            font-size: 14px;
         }
         th, td {
+            border: 1px solid #ddd;
             padding: 10px;
-            text-align: center;
         }
         th {
-            background-color: #007BFF;
+            background-color: #007bff;
             color: white;
         }
-        button {
-            background-color: #28a745;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-            margin-top: 10px;
-        }
-        button:hover {
-            background-color: #218838;
+        td {
+            text-align: center;
         }
         .fecha {
-            font-size: 14px;
+            margin-top: 10px;
+            font-size: 13px;
             color: #666;
+        }
+        .btn {
+            display: inline-block;
+            margin: 10px 5px 0;
+            padding: 10px 20px;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-print {
+            background-color: #007bff;
+        }
+        .btn-print:hover {
+            background-color: #0056b3;
+        }
+        .btn-back {
+            background-color: #28a745;
+        }
+        .btn-back:hover {
+            background-color: #218838;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>Reporte de Gastos Recibidos</h2>
+    <h2>📄 Reporte de Gastos Recibidos</h2>
 
     <?php
     try {
-        // Consulta de gastos con INNER JOIN
-        $stmt = $conexion->query("SELECT g.codigo, g.factura, g.fechaems, g.monto, g.fechacre, p.codprov, p.razonsoc 
-                                  FROM gastos g 
-                                  INNER JOIN proveedores p ON g.codprov = p.codprov 
-                                  ORDER BY g.fechacre DESC");
+        $stmt = $pdo->prepare("
+            SELECT g.codigo, g.factura, g.fecha_emision, g.valor_gasto, g.fecha_creacion, 
+                   p.cod_proveedor, p.razon_social, s.razon_social AS sucursal
+            FROM gastos g
+            INNER JOIN proveedores p ON g.cod_proveedor = p.cod_proveedor
+            INNER JOIN sucursal s ON g.cod_cia = s.cod_cia
+            ORDER BY g.fecha_creacion DESC
+        ");
+        $stmt->execute();
 
         if ($stmt->rowCount() > 0) {
             echo "<table>";
             echo "<tr>
-                    <th>Código</th>
+                    <th>Código Proveedor</th>
                     <th>Razón Social</th>
-                    <th>Número de Factura</th>
-                    <th>Fecha</th>
+                    <th>N° Factura</th>
+                    <th>Fecha Emisión</th>
                     <th>Monto Bs.</th>
+                    <th>Sucursal</th>
                   </tr>";
 
-            while ($reg = $stmt->fetch()) {
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                 echo "<tr>";
-                echo "<td>" . htmlspecialchars($reg['codprov']) . "</td>";
-                echo "<td>" . htmlspecialchars($reg['razonsoc']) . "</td>";
-                echo "<td>" . htmlspecialchars($reg['factura']) . "</td>";
-                echo "<td>" . htmlspecialchars($reg['fechaems']) . "</td>";
-                echo "<td align='right'>" . number_format($reg['monto'], 2, ',', '.') . "</td>";
+                echo "<td>" . htmlspecialchars($row['cod_proveedor']) . "</td>";
+                echo "<td>" . htmlspecialchars($row['razon_social']) . "</td>";
+                echo "<td>" . htmlspecialchars($row['factura']) . "</td>";
+                echo "<td>" . htmlspecialchars($row['fecha_emision']) . "</td>";
+                echo "<td align='right'>" . number_format($row['valor_gasto'], 2, ',', '.') . "</td>";
+                echo "<td>" . htmlspecialchars($row['sucursal']) . "</td>";
                 echo "</tr>";
             }
+
             echo "</table>";
         } else {
             echo "<p>No hay gastos registrados.</p>";
         }
-
     } catch (PDOException $e) {
-        echo "<p>Error en la consulta: " . $e->getMessage() . "</p>";
+        echo "<p>Error en la consulta: " . htmlspecialchars($e->getMessage()) . "</p>";
     }
     ?>
 
-    <p class="fecha">Fecha de emisión: <?php echo date("d-m-Y H:i:s"); ?></p>
+    <p class="fecha">Fecha del reporte: <?= date("d-m-Y H:i:s") ?></p>
 
-    <button onclick="window.print()">Imprimir</button>
+    <button class="btn btn-print" onclick="window.print()">🖨️ Imprimir</button>
+    <button class="btn btn-back" onclick="location.href='index.php'">🏠 Volver al Menú</button>
 </div>
 
 </body>

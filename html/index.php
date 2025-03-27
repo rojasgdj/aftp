@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-// Evitar caché para prevenir que se acceda a la página después del logout
+// Evitar caché para prevenir acceso después del logout
 header("Cache-Control: no-cache, no-store, must-revalidate");
 header("Pragma: no-cache");
 header("Expires: 0");
@@ -30,24 +30,23 @@ if (!isset($_SESSION['logged']) || $_SESSION['logged'] !== true) {
 
         body {
             background-color: #f4f4f4;
-            text-align: center;
-            padding: 20px;
+            margin: 0;
+            padding: 0;
         }
 
         .container {
-            max-width: 900px;
+            max-width: 1200px;
             margin: auto;
             background: white;
             padding: 20px;
             border-radius: 8px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
         .titulo {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap; /* Evita superposición en pantallas pequeñas */
             padding: 10px;
             background: #007bff;
             color: white;
@@ -70,14 +69,13 @@ if (!isset($_SESSION['logged']) || $_SESSION['logged'] !== true) {
             padding: 8px 12px;
             border-radius: 5px;
             display: inline-block;
-            margin-top: 5px; /* Espaciado en móviles */
         }
 
         .menu a:hover {
             background: darkred;
         }
 
-        /* Estilo del menú */
+        /* Estilos del menú */
         .nav {
             background: #343a40;
             border-radius: 0 0 8px 8px;
@@ -88,19 +86,19 @@ if (!isset($_SESSION['logged']) || $_SESSION['logged'] !== true) {
             padding: 0;
             display: flex;
             justify-content: center;
-            flex-wrap: wrap;
+            position: relative;
         }
 
         .nav ul li {
             position: relative;
+            padding: 15px;
         }
 
         .nav ul li a {
-            display: block;
-            padding: 15px 20px;
             color: white;
             text-decoration: none;
             font-size: 16px;
+            display: block;
             cursor: pointer;
         }
 
@@ -108,8 +106,8 @@ if (!isset($_SESSION['logged']) || $_SESSION['logged'] !== true) {
             background: #495057;
         }
 
-        /* Submenú oculto */
-        .nav ul li ul {
+        /* 🔹 Submenús ocultos por defecto */
+        .nav ul li ul.submenu {
             display: none;
             position: absolute;
             background: #495057;
@@ -120,18 +118,19 @@ if (!isset($_SESSION['logged']) || $_SESSION['logged'] !== true) {
             padding: 0;
         }
 
-        .nav ul li ul li {
+        .nav ul li ul.submenu li {
             display: block;
             text-align: left;
         }
 
-        .nav ul li ul li a {
+        .nav ul li ul.submenu li a {
             padding: 10px;
             font-size: 14px;
             display: block;
+            color: white;
         }
 
-        .nav ul li ul li a:hover {
+        .nav ul li ul.submenu li a:hover {
             background: #007bff;
         }
 
@@ -157,14 +156,13 @@ if (!isset($_SESSION['logged']) || $_SESSION['logged'] !== true) {
                 width: 100%;
             }
 
-            .nav ul li ul {
+            .nav ul li ul.submenu {
                 position: relative;
                 width: 100%;
             }
         }
     </style>
 </head>
-
 <body>
     <div class="container">
         <!-- Encabezado -->
@@ -178,32 +176,39 @@ if (!isset($_SESSION['logged']) || $_SESSION['logged'] !== true) {
         <nav class="nav">
             <ul>
                 <li>
-                    <a href="#" class="menu-toggle">Fichas ▼</a>
-                    <ul>
-                        <li><a href="cia01.php">Compañías</a></li>
+                    <a href="#" class="menu-toggle">Fichas de Registros ▼</a>
+                    <ul class="submenu">
+                        <li><a href="cia01.php">Sucursales</a></li>
                         <li><a href="clientes01.php">Clientes</a></li>
                         <li><a href="proveedores01.php">Proveedores</a></li>
                     </ul>
                 </li>
                 <li>
-                    <a href="#" class="menu-toggle">Ingreso AFTP ▼</a>
-                    <ul>
+                    <a href="#" class="menu-toggle">Ingreso de Facturas ▼</a>
+                    <ul class="submenu">
                         <li><a href="factura01.php">Ingreso de Factura</a></li>
-                        <li><a href="buscarfactura.php">Consulta</a></li>
+                        <li><a href="buscarfactura.php">Consulta de Factura</a></li>
                     </ul>
                 </li>
                 <li>
                     <a href="#" class="menu-toggle">Gastos ▼</a>
-                    <ul>
+                    <ul class="submenu">
                         <li><a href="gastos01.php">Ingreso de Gastos</a></li>
                     </ul>
                 </li>
                 <li>
                     <a href="#" class="menu-toggle">Reportes ▼</a>
-                    <ul>
+                    <ul class="submenu">
                         <li><a href="reportefacturas.php">Facturas Recibidas</a></li>
                         <li><a href="reportegastos.php">Gastos Recibidos</a></li>
                         <li><a href="reporteprov.php">Listado de Proveedores</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#" class="menu-toggle">AFTP ▼</a>
+                    <ul class="submenu">
+                        <li><a href="soportes.php">Cargar Soporte</a></li>
+                        <li><a href="buscarsoporte.php">Buscar Soporte</a></li>
                     </ul>
                 </li>
             </ul>
@@ -211,29 +216,28 @@ if (!isset($_SESSION['logged']) || $_SESSION['logged'] !== true) {
     </div>
 
     <script>
-        // Activa el menú desplegable al hacer clic
         document.querySelectorAll('.menu-toggle').forEach(item => {
             item.addEventListener('click', function (event) {
-                event.preventDefault(); // Evita que el enlace navegue
+                event.preventDefault();
                 let submenu = this.nextElementSibling;
-                
-                // Cierra otros submenús abiertos
-                document.querySelectorAll('.nav ul li ul').forEach(menu => {
+
+                // 🔹 Oculta otros submenús abiertos
+                document.querySelectorAll('.submenu').forEach(menu => {
                     if (menu !== submenu) {
                         menu.style.display = 'none';
                     }
                 });
 
-                // Alterna la visibilidad del submenú actual
+                // 🔹 Alternar visibilidad del submenú
                 submenu.style.display = submenu.style.display === 'block' ? 'none' : 'block';
             });
         });
 
-        // Cerrar menú al hacer clic fuera
+        // 🔹 Cierra los menús si se hace clic fuera
         document.addEventListener('click', function (event) {
             let isClickInsideMenu = event.target.closest('.nav ul li');
             if (!isClickInsideMenu) {
-                document.querySelectorAll('.nav ul li ul').forEach(menu => {
+                document.querySelectorAll('.submenu').forEach(menu => {
                     menu.style.display = 'none';
                 });
             }

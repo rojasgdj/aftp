@@ -1,5 +1,19 @@
 <?php
-require 'db.php'; // Conectar a la base de datos
+session_start();
+session_regenerate_id(true); // Prevenir secuestro de sesión
+
+// Evitar caché
+header("Cache-Control: no-cache, no-store, must-revalidate");
+header("Pragma: no-cache");
+header("Expires: 0");
+
+// Si no hay sesión activa, redirigir al login
+if (!isset($_SESSION['logged']) || $_SESSION['logged'] !== true) {
+    header("Location: login.php");
+    exit;
+}
+
+require_once 'db.php'; // Conectar a la base de datos
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -8,7 +22,7 @@ require 'db.php'; // Conectar a la base de datos
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema Administrativo AFTP - Sucursales</title>
 
-    <!-- Estilos mejorados -->
+    <!-- Estilos -->
     <style>
         * {
             margin: 0;
@@ -33,7 +47,6 @@ require 'db.php'; // Conectar a la base de datos
         }
 
         .titulo {
-            text-align: center;
             background: #007bff;
             color: white;
             padding: 15px;
@@ -126,21 +139,11 @@ require 'db.php'; // Conectar a la base de datos
             border-radius: 5px;
             cursor: pointer;
             width: 100%;
-            margin-top: 15px; /* Separación entre dirección y botón */
+            margin-top: 15px;
         }
 
         button:hover {
             background: #218838;
-        }
-
-        /* Estilo especial para el botón de impresión */
-        .print-btn {
-            background: #17a2b8;
-            margin-bottom: 15px;
-        }
-
-        .print-btn:hover {
-            background: #138496;
         }
     </style>
 </head>
@@ -186,9 +189,6 @@ require 'db.php'; // Conectar a la base de datos
         <!-- Listado de sucursales -->
         <div id="listado" class="content">
             <h3>Listado de Sucursales</h3>
-            
-            <!-- Botón para imprimir -->
-            <button onclick="printTable()" class="print-btn">🖨️ Imprimir Listado</button>
 
             <div id="printArea">
                 <?php
@@ -225,16 +225,6 @@ require 'db.php'; // Conectar a la base de datos
         function openTab(tabId) {
             document.querySelectorAll(".content").forEach(el => el.classList.remove("active"));
             document.getElementById(tabId).classList.add("active");
-        }
-
-        // Función para imprimir solo la tabla
-        function printTable() {
-            var content = document.getElementById("printArea").innerHTML;
-            var originalContent = document.body.innerHTML;
-
-            document.body.innerHTML = content;
-            window.print();
-            document.body.innerHTML = originalContent;
         }
     </script>
 </body>

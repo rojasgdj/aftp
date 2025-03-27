@@ -1,18 +1,28 @@
 <?php
-require 'db.php'; // Conectar a la base de datos
+session_start();
+session_regenerate_id(true);
+
+// Evitar caché
+header("Cache-Control: no-cache, no-store, must-revalidate");
+header("Pragma: no-cache");
+header("Expires: 0");
+
+if (!isset($_SESSION['logged']) || $_SESSION['logged'] !== true) {
+    header("Location: login.php");
+    exit;
+}
+
+require_once 'db.php';
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema Administrativo AFTP - Ingreso de Facturas</title>
-
+    <title>Sistema AFTP - Ingreso de Facturas</title>
     <style>
         * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+            margin: 0; padding: 0; box-sizing: border-box;
             font-family: Arial, sans-serif;
         }
 
@@ -28,11 +38,10 @@ require 'db.php'; // Conectar a la base de datos
             background: white;
             padding: 20px;
             border-radius: 8px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
 
         .titulo {
-            text-align: center;
             background: #007bff;
             color: white;
             padding: 15px;
@@ -64,17 +73,33 @@ require 'db.php'; // Conectar a la base de datos
         }
 
         .tab {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
             padding: 10px;
             cursor: pointer;
             border-radius: 5px;
             background: #007bff;
             color: white;
-            width: 150px;
+            width: 160px;
             text-align: center;
+            font-weight: bold;
         }
 
         .tab:hover {
             background: #0056b3;
+        }
+
+        .tab a {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            width: 100%;
+            height: 100%;
         }
 
         .content {
@@ -98,7 +123,7 @@ require 'db.php'; // Conectar a la base de datos
         }
 
         button {
-            background: #28a745;
+            background: #007bff;
             color: white;
             padding: 10px;
             border: none;
@@ -109,7 +134,7 @@ require 'db.php'; // Conectar a la base de datos
         }
 
         button:hover {
-            background: #218838;
+            background: #0056b3;
         }
 
         table {
@@ -133,7 +158,6 @@ require 'db.php'; // Conectar a la base de datos
             text-align: center;
         }
 
-        /* Limitar la descripción para evitar desbordes */
         .descripcion {
             text-align: left;
             max-width: 250px;
@@ -143,7 +167,6 @@ require 'db.php'; // Conectar a la base de datos
         }
     </style>
 </head>
-
 <body>
     <div class="container">
         <!-- Título -->
@@ -159,97 +182,97 @@ require 'db.php'; // Conectar a la base de datos
         <!-- Pestañas -->
         <div class="tab-container">
             <div class="tab" onclick="openTab('crear')">Nueva Factura</div>
+            <div class="tab"><a href="buscarfactura.php">🔎 Consultar Factura</a></div>
             <div class="tab" onclick="openTab('listado')">Listado</div>
         </div>
 
         <!-- Formulario de creación -->
         <div id="crear" class="content active">
             <h3>Registrar Factura</h3>
-            <form id="facturaForm" method="post" action="factura01valida.php">
-                <label for="factura"><b>Número de Factura</b></label>
-                <input type="text" name="factura" id="factura" required>
+            <form method="post" action="factura01valida.php">
+                <label><b>Número de Factura</b></label>
+                <input type="text" name="factura" required>
 
-                <label for="concepto"><b>Concepto</b></label>
-                <textarea name="concepto" id="concepto" rows="3" required></textarea>
+                <label><b>Concepto</b></label>
+                <textarea name="concepto" rows="3" required></textarea>
 
-                <label for="fecha"><b>Fecha de Emisión</b></label>
-                <input type="date" name="fecha" id="fecha" required>
+                <label><b>Fecha de Emisión</b></label>
+                <input type="date" name="fecha" required>
 
-                <label for="cliente"><b>Cliente</b></label>
-                <select name="cliente" id="cliente" required>
-                    <option value="">Seleccione un cliente</option>
+                <label><b>Proveedor</b></label>
+                <select name="proveedor" required>
+                    <option value="">Seleccione un proveedor</option>
                     <?php
                     try {
-                        $stmt = $pdo->query("SELECT cod_cliente, razon_social FROM clientes");
-                        while ($cliente = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                            echo "<option value='" . htmlspecialchars($cliente['cod_cliente']) . "'>" . htmlspecialchars($cliente['razon_social']) . "</option>";
+                        $stmt = $pdo->query("SELECT cod_proveedor, razon_social FROM proveedores ORDER BY razon_social");
+                        while ($prov = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                            echo "<option value='" . htmlspecialchars($prov['cod_proveedor']) . "'>" . htmlspecialchars($prov['razon_social']) . "</option>";
                         }
                     } catch (PDOException $e) {
-                        echo "<p>Error: " . htmlspecialchars($e->getMessage()) . "</p>";
+                        echo "<option value=''>Error al cargar proveedores</option>";
                     }
                     ?>
                 </select>
 
-                <label for="cod_cia"><b>Sucursal</b></label>
-                <select name="cod_cia" id="cod_cia" required>
+                <label><b>Sucursal</b></label>
+                <select name="cod_cia" required>
                     <option value="">Seleccione una sucursal</option>
                     <?php
                     try {
-                        $stmt = $pdo->query("SELECT cod_cia, razon_social FROM sucursal");
-                        while ($sucursal = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                            echo "<option value='" . htmlspecialchars($sucursal['cod_cia']) . "'>" . htmlspecialchars($sucursal['razon_social']) . "</option>";
+                        $stmt = $pdo->query("SELECT cod_cia, razon_social FROM sucursal ORDER BY razon_social");
+                        while ($suc = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                            echo "<option value='" . htmlspecialchars($suc['cod_cia']) . "'>" . htmlspecialchars($suc['razon_social']) . "</option>";
                         }
                     } catch (PDOException $e) {
-                        echo "<p>Error: " . htmlspecialchars($e->getMessage()) . "</p>";
+                        echo "<option value=''>Error al cargar sucursales</option>";
                     }
                     ?>
                 </select>
 
-                <label for="monto"><b>Monto Bs.</b></label>
-                <input type="number" name="monto" id="monto" step="0.01" min="0" required>
-
-                <button type="submit">Registrar</button>
+                <button type="submit">Registrar Factura</button>
             </form>
         </div>
 
-        <!-- Listado de Facturas -->
+        <!-- Listado de facturas -->
         <div id="listado" class="content">
             <h3>Últimas Facturas Registradas</h3>
             <?php
             try {
                 $stmt = $pdo->prepare("
-                    SELECT f.numero_factura, f.concepto, f.fecha_emision, f.valor_factura, f.fecha_creacion, f.cod_cliente, f.cod_cia, 
-                        c.razon_social AS cliente, s.razon_social AS sucursal 
+                    SELECT f.numero_factura, f.concepto, f.fecha_emision, f.fecha_creacion,
+                           f.valor_factura, p.razon_social AS proveedor, s.razon_social AS sucursal
                     FROM facturas f
-                    INNER JOIN clientes c ON f.cod_cliente = c.cod_cliente
+                    INNER JOIN proveedores p ON f.cod_proveedor = p.cod_proveedor
                     INNER JOIN sucursal s ON f.cod_cia = s.cod_cia
-                    ORDER BY f.fecha_creacion DESC
-                    LIMIT 10
+                    ORDER BY f.fecha_creacion DESC LIMIT 10
                 ");
                 $stmt->execute();
                 $facturas = $stmt->fetchAll();
 
-                if (count($facturas) > 0) {
+                if ($facturas) {
                     echo "<table>";
-                    echo "<tr><th>Número</th><th>Cliente</th><th>Sucursal</th><th>Fecha</th><th>Descripción</th><th>Monto</th></tr>";
-
-                    foreach ($facturas as $factura) {
+                    echo "<tr>
+                            <th>Número</th>
+                            <th>Proveedor</th>
+                            <th>Sucursal</th>
+                            <th>Fecha</th>
+                            <th>Descripción</th>
+                          </tr>";
+                    foreach ($facturas as $f) {
                         echo "<tr>";
-                        echo "<td>" . htmlspecialchars($factura['numero_factura']) . "</td>";
-                        echo "<td>" . htmlspecialchars($factura['cliente']) . "</td>";
-                        echo "<td>" . htmlspecialchars($factura['sucursal']) . "</td>";
-                        echo "<td>" . htmlspecialchars($factura['fecha_emision']) . "</td>";
-                        echo "<td class='descripcion'>" . htmlspecialchars($factura['concepto']) . "</td>";
-                        echo "<td align='right'>" . number_format($factura['valor_factura'], 2, ',', '.') . "</td>";
+                        echo "<td>" . htmlspecialchars($f['numero_factura']) . "</td>";
+                        echo "<td>" . htmlspecialchars($f['proveedor']) . "</td>";
+                        echo "<td>" . htmlspecialchars($f['sucursal']) . "</td>";
+                        echo "<td>" . htmlspecialchars($f['fecha_emision']) . "</td>";
+                        echo "<td class='descripcion'>" . htmlspecialchars($f['concepto']) . "</td>";
                         echo "</tr>";
                     }
-
                     echo "</table>";
                 } else {
                     echo "<p>No hay facturas registradas.</p>";
                 }
             } catch (PDOException $e) {
-                echo "<p>Error en la consulta: " . htmlspecialchars($e->getMessage()) . "</p>";
+                echo "<p>Error: " . htmlspecialchars($e->getMessage()) . "</p>";
             }
             ?>
         </div>

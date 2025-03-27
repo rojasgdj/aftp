@@ -1,6 +1,19 @@
 @charset "utf-8";
+
 .titulo {
     font-family: Verdana, Geneva, sans-serif;
     font-size: 16px;
-    background-color: #66CCFF; /* Color en hexadecimal completo */
+    background-color: #66CCFF;
+    color: #000; /* Asegurar buen contraste */
+    text-align: center;
+    padding: 10px;
+    border-radius: 4px; /* Bordes redondeados */
+}
+
+/* Responsividad */
+@media (max-width: 600px) {
+    .titulo {
+        font-size: 14px;
+        padding: 8px;
+    }
 }

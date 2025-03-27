@@ -1,5 +1,19 @@
 <?php
-require 'db.php'; // Conectar a la base de datos
+session_start();
+session_regenerate_id(true); // Prevenir secuestro de sesión
+
+// Evitar caché
+header("Cache-Control: no-cache, no-store, must-revalidate");
+header("Pragma: no-cache");
+header("Expires: 0");
+
+// Si no hay sesión activa, redirigir al login
+if (!isset($_SESSION['logged']) || $_SESSION['logged'] !== true) {
+    header("Location: login.php");
+    exit;
+}
+
+require_once 'db.php'; // Conectar a la base de datos
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -8,7 +22,7 @@ require 'db.php'; // Conectar a la base de datos
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema Administrativo AFTP - Clientes</title>
 
-    <!-- Estilos mejorados -->
+    <!-- Estilos -->
     <style>
         * {
             margin: 0;
@@ -33,7 +47,6 @@ require 'db.php'; // Conectar a la base de datos
         }
 
         .titulo {
-            text-align: center;
             background: #007bff;
             color: white;
             padding: 15px;
@@ -132,16 +145,6 @@ require 'db.php'; // Conectar a la base de datos
         button:hover {
             background: #218838;
         }
-
-        /* Estilo especial para el botón de impresión */
-        .print-btn {
-            background: #17a2b8;
-            margin-bottom: 15px;
-        }
-
-        .print-btn:hover {
-            background: #138496;
-        }
     </style>
 </head>
 
@@ -190,10 +193,6 @@ require 'db.php'; // Conectar a la base de datos
         <div id="listado" class="content">
             <h3>Listado de Clientes</h3>
 
-            <!-- Botón para imprimir -->
-            <button onclick="printTable()" class="print-btn">🖨️ Imprimir Listado</button>
-
-            <!-- Área de impresión -->
             <div id="printArea">
                 <?php
                 try {
@@ -227,25 +226,11 @@ require 'db.php'; // Conectar a la base de datos
         </div>
     </div>
 
-    <!-- Script para manejar las pestañas y la impresión -->
+    <!-- Script para manejar las pestañas -->
     <script>
         function openTab(tabId) {
             document.querySelectorAll(".content").forEach(el => el.classList.remove("active"));
             document.getElementById(tabId).classList.add("active");
-        }
-
-        function printTable() {
-            var content = document.getElementById("printArea").innerHTML;
-            var printWindow = window.open('', '', 'width=900,height=600');
-            printWindow.document.write('<html><head><title>Listado de Clientes</title>');
-            printWindow.document.write('<style>table { width: 100%; border-collapse: collapse; font-family: Arial, sans-serif; }');
-            printWindow.document.write('table, th, td { border: 1px solid black; padding: 8px; text-align: left; }');
-            printWindow.document.write('th { background-color: #007bff; color: white; }</style></head><body>');
-            printWindow.document.write('<h2>Listado de Clientes</h2>');
-            printWindow.document.write(content);
-            printWindow.document.write('</body></html>');
-            printWindow.document.close();
-            printWindow.print();
         }
     </script>
 </body>
