@@ -168,121 +168,124 @@ require_once 'db.php';
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Título -->
-        <div class="titulo">
-            <h2>Sistema de Control de Archivo - Ingreso de Facturas</h2>
-        </div>
-
-        <!-- Menú -->
-        <div class="menu">
-            <a href="index.php">Menú Inicio</a>
-        </div>
-
-        <!-- Pestañas -->
-        <div class="tab-container">
-            <div class="tab" onclick="openTab('crear')">Nueva Factura</div>
-            <div class="tab"><a href="buscarfactura.php">🔎 Consultar Factura</a></div>
-            <div class="tab" onclick="openTab('listado')">Listado</div>
-        </div>
-
-        <!-- Formulario de creación -->
-        <div id="crear" class="content active">
-            <h3>Registrar Factura</h3>
-            <form method="post" action="factura01valida.php">
-                <label><b>Número de Factura</b></label>
-                <input type="text" name="factura" required>
-
-                <label><b>Concepto</b></label>
-                <textarea name="concepto" rows="3" required></textarea>
-
-                <label><b>Fecha de Emisión</b></label>
-                <input type="date" name="fecha" required>
-
-                <label><b>Proveedor</b></label>
-                <select name="proveedor" required>
-                    <option value="">Seleccione un proveedor</option>
-                    <?php
-                    try {
-                        $stmt = $pdo->query("SELECT cod_proveedor, razon_social FROM proveedores ORDER BY razon_social");
-                        while ($prov = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                            echo "<option value='" . htmlspecialchars($prov['cod_proveedor']) . "'>" . htmlspecialchars($prov['razon_social']) . "</option>";
-                        }
-                    } catch (PDOException $e) {
-                        echo "<option value=''>Error al cargar proveedores</option>";
-                    }
-                    ?>
-                </select>
-
-                <label><b>Sucursal</b></label>
-                <select name="cod_cia" required>
-                    <option value="">Seleccione una sucursal</option>
-                    <?php
-                    try {
-                        $stmt = $pdo->query("SELECT cod_cia, razon_social FROM sucursal ORDER BY razon_social");
-                        while ($suc = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                            echo "<option value='" . htmlspecialchars($suc['cod_cia']) . "'>" . htmlspecialchars($suc['razon_social']) . "</option>";
-                        }
-                    } catch (PDOException $e) {
-                        echo "<option value=''>Error al cargar sucursales</option>";
-                    }
-                    ?>
-                </select>
-
-                <button type="submit">Registrar Factura</button>
-            </form>
-        </div>
-
-        <!-- Listado de facturas -->
-        <div id="listado" class="content">
-            <h3>Últimas Facturas Registradas</h3>
-            <?php
-            try {
-                $stmt = $pdo->prepare("
-                    SELECT f.numero_factura, f.concepto, f.fecha_emision, f.fecha_creacion,
-                           f.valor_factura, p.razon_social AS proveedor, s.razon_social AS sucursal
-                    FROM facturas f
-                    INNER JOIN proveedores p ON f.cod_proveedor = p.cod_proveedor
-                    INNER JOIN sucursal s ON f.cod_cia = s.cod_cia
-                    ORDER BY f.fecha_creacion DESC LIMIT 10
-                ");
-                $stmt->execute();
-                $facturas = $stmt->fetchAll();
-
-                if ($facturas) {
-                    echo "<table>";
-                    echo "<tr>
-                            <th>Número</th>
-                            <th>Proveedor</th>
-                            <th>Sucursal</th>
-                            <th>Fecha</th>
-                            <th>Descripción</th>
-                          </tr>";
-                    foreach ($facturas as $f) {
-                        echo "<tr>";
-                        echo "<td>" . htmlspecialchars($f['numero_factura']) . "</td>";
-                        echo "<td>" . htmlspecialchars($f['proveedor']) . "</td>";
-                        echo "<td>" . htmlspecialchars($f['sucursal']) . "</td>";
-                        echo "<td>" . htmlspecialchars($f['fecha_emision']) . "</td>";
-                        echo "<td class='descripcion'>" . htmlspecialchars($f['concepto']) . "</td>";
-                        echo "</tr>";
-                    }
-                    echo "</table>";
-                } else {
-                    echo "<p>No hay facturas registradas.</p>";
-                }
-            } catch (PDOException $e) {
-                echo "<p>Error: " . htmlspecialchars($e->getMessage()) . "</p>";
-            }
-            ?>
-        </div>
+<div class="container">
+    <!-- Título -->
+    <div class="titulo">
+        <h2>Sistema de Control de Archivo - Ingreso de Facturas</h2>
     </div>
 
-    <script>
-        function openTab(tabId) {
-            document.querySelectorAll(".content").forEach(el => el.classList.remove("active"));
-            document.getElementById(tabId).classList.add("active");
+    <!-- Menú -->
+    <div class="menu">
+        <a href="index.php">Menú Inicio</a>
+    </div>
+
+    <!-- Pestañas -->
+    <div class="tab-container">
+        <div class="tab" onclick="openTab('crear')">Nueva Factura</div>
+        <div class="tab"><a href="buscarfactura.php">🔎 Consultar Factura</a></div>
+        <div class="tab" onclick="openTab('listado')">Listado</div>
+    </div>
+
+    <!-- Formulario de creación -->
+    <div id="crear" class="content active">
+        <h3>Registrar Factura</h3>
+        <form method="post" action="factura01valida.php">
+            <label><b>Número de Factura</b></label>
+            <input type="text" name="factura" required>
+
+            <label><b>Concepto</b></label>
+            <textarea name="concepto" rows="3" required></textarea>
+
+            <label><b>Fecha de Emisión</b></label>
+            <input type="date" name="fecha" required>
+
+            <label><b>Proveedor</b></label>
+            <select name="proveedor" required>
+                <option value="">Seleccione un proveedor</option>
+                <?php
+                try {
+                    $stmt = $pdo->query("SELECT cod_proveedor, razon_social FROM proveedores ORDER BY razon_social");
+                    while ($prov = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                        echo "<option value='" . htmlspecialchars($prov['cod_proveedor']) . "'>" . htmlspecialchars($prov['razon_social']) . "</option>";
+                    }
+                } catch (PDOException $e) {
+                    echo "<option value=''>Error al cargar proveedores</option>";
+                }
+                ?>
+            </select>
+
+            <label><b>Monto Bs.</b></label>
+            <input type="number" name="monto" step="0.01" min="0" required>
+
+            <label><b>Sucursal</b></label>
+            <select name="cod_cia" required>
+                <option value="">Seleccione una sucursal</option>
+                <?php
+                try {
+                    $stmt = $pdo->query("SELECT cod_cia, razon_social FROM sucursal ORDER BY razon_social");
+                    while ($suc = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                        echo "<option value='" . htmlspecialchars($suc['cod_cia']) . "'>" . htmlspecialchars($suc['razon_social']) . "</option>";
+                    }
+                } catch (PDOException $e) {
+                    echo "<option value=''>Error al cargar sucursales</option>";
+                }
+                ?>
+            </select>
+
+            <button type="submit">Registrar Factura</button>
+        </form>
+    </div>
+
+    <!-- Listado de facturas -->
+    <div id="listado" class="content">
+        <h3>Últimas Facturas Registradas</h3>
+        <?php
+        try {
+            $stmt = $pdo->prepare("
+                SELECT f.numero_factura, f.concepto, f.fecha_emision, f.fecha_creacion,
+                       f.valor_factura, p.razon_social AS proveedor, s.razon_social AS sucursal
+                FROM facturas f
+                INNER JOIN proveedores p ON f.cod_proveedor = p.cod_proveedor
+                INNER JOIN sucursal s ON f.cod_cia = s.cod_cia
+                ORDER BY f.fecha_creacion DESC LIMIT 10
+            ");
+            $stmt->execute();
+            $facturas = $stmt->fetchAll();
+
+            if ($facturas) {
+                echo "<table>";
+                echo "<tr>
+                        <th>Número</th>
+                        <th>Proveedor</th>
+                        <th>Sucursal</th>
+                        <th>Fecha</th>
+                        <th>Descripción</th>
+                      </tr>";
+                foreach ($facturas as $f) {
+                    echo "<tr>";
+                    echo "<td>" . htmlspecialchars($f['numero_factura']) . "</td>";
+                    echo "<td>" . htmlspecialchars($f['proveedor']) . "</td>";
+                    echo "<td>" . htmlspecialchars($f['sucursal']) . "</td>";
+                    echo "<td>" . htmlspecialchars($f['fecha_emision']) . "</td>";
+                    echo "<td class='descripcion'>" . htmlspecialchars($f['concepto']) . "</td>";
+                    echo "</tr>";
+                }
+                echo "</table>";
+            } else {
+                echo "<p>No hay facturas registradas.</p>";
+            }
+        } catch (PDOException $e) {
+            echo "<p>Error: " . htmlspecialchars($e->getMessage()) . "</p>";
         }
-    </script>
+        ?>
+    </div>
+</div>
+
+<script>
+    function openTab(tabId) {
+        document.querySelectorAll(".content").forEach(el => el.classList.remove("active"));
+        document.getElementById(tabId).classList.add("active");
+    }
+</script>
 </body>
 </html>

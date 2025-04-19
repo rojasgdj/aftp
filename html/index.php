@@ -167,7 +167,7 @@ if (!isset($_SESSION['logged']) || $_SESSION['logged'] !== true) {
     <div class="container">
         <!-- Encabezado -->
         <div class="titulo">
-            <img src="LogoVeramedWEB.jpg" alt="Logo">
+            <img src="img/aftp-logo.png" alt="Logo">
             <h2>Sistema de Control de Archivo</h2>
             <div class="menu"><a href="logout.php">Cerrar sesión</a></div>
         </div>
@@ -209,6 +209,7 @@ if (!isset($_SESSION['logged']) || $_SESSION['logged'] !== true) {
                     <ul class="submenu">
                         <li><a href="soportes.php">Cargar Soporte</a></li>
                         <li><a href="buscarsoporte.php">Buscar Soporte</a></li>
+                        <li><a href="indices.php">Índices de Soportes</a></li>
                     </ul>
                 </li>
             </ul>

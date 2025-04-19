@@ -17,8 +17,8 @@ if (isset($_SESSION['logged']) && $_SESSION['logged'] === true) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Sistema de Control de Archivo - Inicio de sesión">
-  <meta name="author" content="Bits Software">
+  <meta name="description" content="Sistema de Control AFTP - Inicio de sesión">
+  <meta name="author" content="AFTP">
   <title>Iniciar Sesión - Sistema de Control de Archivo</title>
 
   <!-- Estilos -->
@@ -30,7 +30,7 @@ if (isset($_SESSION['logged']) && $_SESSION['logged'] === true) {
   <div id="container">
     <form id="loginForm" method="post" action="iniciasesion.php" autocomplete="off">
       <center>
-        <p><img src="LogoVeramedWEB.jpg" alt="Logo de Veramed" width="293" height="119"></p>
+        <p><img src="img/aftp-logo.png" alt="Logo AFTP" width="149" height="119"></p>
         <p>&nbsp;</p>
         <div class="block-border">
           <p><strong>Sistema AFTP - Inicio de sesión</strong></p>
@@ -61,7 +61,7 @@ if (isset($_SESSION['logged']) && $_SESSION['logged'] === true) {
     </form>
 
     <div id="footer">
-      <h5>Copyright 2025 © Bits Software. | Design with us</h5>
+      <h5>Copyright 2025 © AFTP. | Design with us</h5>
     </div>
   </div>
 

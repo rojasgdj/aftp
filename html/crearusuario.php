@@ -19,7 +19,7 @@ if (isset($_SESSION['logged']) && $_SESSION['logged'] === true) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Sistema de Control de Archivo - Registro de Usuario">
   <meta name="author" content="Bits Software">
-  <title>Registro de Usuario - Sistema de Control de Archivo</title>
+  <title>Registro de Usuario - Sistema de Control AFTP</title>
 
   <!-- Estilos -->
   <link href="Public/css/estilos.css" rel="stylesheet">
@@ -29,7 +29,7 @@ if (isset($_SESSION['logged']) && $_SESSION['logged'] === true) {
   <div id="container">
     <form id="registerForm" method="post" action="registrousuario.php" autocomplete="off">
       <center>
-        <p><img src="LogoVeramedWEB.jpg" alt="Logo de Veramed" width="293" height="119"></p>
+        <p><img src="img/aftp-logo.png" alt="Logo AFTP" width="149" height="119"></p>
         <p>&nbsp;</p>
         <div class="block-border">
           <p><strong>Sistema AFTP - Registro de Usuario</strong></p>
