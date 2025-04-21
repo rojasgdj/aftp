@@ -15,29 +15,64 @@ if (!isset($_SESSION['logged']) || $_SESSION['logged'] !== true) {
 
 require_once 'db.php';
 
-// Procesar envío
+function detectarTipoDocumento($archivoPdfTmp)
+{
+    $cmd = escapeshellcmd("/opt/aftp-ml/env/bin/python3 /opt/aftp-ml/clasificador.py " . $archivoPdfTmp);
+    $output = shell_exec($cmd);
+    if (!$output) return null;
+
+    if (strpos($output, "Clasificado como: FACTURA") !== false) return 'factura';
+    if (strpos($output, "Clasificado como: GASTO") !== false) return 'gasto';
+    return null;
+}
+
+// Inicializar variables
+$numero = $tipoSeleccionado = $pdf_tmp = $tipoDetectado = null;
+$id_retencion = 0;
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['numero_factura'])) {
-    list($numero, $tipo) = explode('|', $_POST['numero_factura']);
+    list($numero, $tipoSeleccionado) = explode('|', $_POST['numero_factura']);
     $id_retencion = intval($_POST['retencion']);
 
-    // Verificar duplicado
-    $check = $pdo->prepare("SELECT COUNT(*) FROM soportes_factura WHERE numero_factura = ?");
-    $check->execute([$numero]);
-    if ($check->fetchColumn() > 0) {
-        echo "<script>alert('Ya existe un soporte para este documento.'); location.href='soportes.php';</script>";
+    if (!isset($_FILES['archivo_pdf']) || $_FILES['archivo_pdf']['error'] !== UPLOAD_ERR_OK) {
+        echo "<script>alert('Error al subir el archivo.'); window.location.href='soportes.php';</script>";
         exit;
     }
 
-    // Obtener datos según tipo
-    if ($tipo === 'factura') {
+    $ext = strtolower(pathinfo($_FILES['archivo_pdf']['name'], PATHINFO_EXTENSION));
+    if ($ext !== 'pdf') {
+        echo "<script>alert('Solo se permiten archivos PDF.'); window.location.href='soportes.php';</script>";
+        exit;
+    }
+
+    $pdf_tmp = $_FILES['archivo_pdf']['tmp_name'];
+    $tipoDetectado = detectarTipoDocumento($pdf_tmp);
+
+    // 🚫 Validación estricta: Si el tipo no coincide, no continúa
+    if ($tipoDetectado && $tipoDetectado !== $tipoSeleccionado) {
+        echo "<script>
+            alert('❌ El archivo cargado fue clasificado como: $tipoDetectado, pero seleccionaste: $tipoSeleccionado. Corrige la selección o sube el archivo correcto.');
+            window.location.href = 'soportes.php';
+        </script>";
+        exit;
+    }
+
+    // Validar duplicado
+    $check = $pdo->prepare("SELECT COUNT(*) FROM soportes_factura WHERE numero_factura = ?");
+    $check->execute([$numero]);
+    if ($check->fetchColumn() > 0) {
+        echo "<script>alert('Ya existe un soporte para este documento.'); window.location.href='soportes.php';</script>";
+        exit;
+    }
+
+    // Obtener datos asociados
+    if ($tipoSeleccionado === 'factura') {
         $stmt = $pdo->prepare("SELECT f.concepto AS descripcion, s.razon_social AS sucursal, f.fecha_emision
-                               FROM facturas f
-                               JOIN sucursal s ON f.cod_cia = s.cod_cia
+                               FROM facturas f JOIN sucursal s ON f.cod_cia = s.cod_cia
                                WHERE f.numero_factura = ?");
     } else {
         $stmt = $pdo->prepare("SELECT g.concepto_gasto AS descripcion, s.razon_social AS sucursal, g.fecha_emision
-                               FROM gastos g
-                               JOIN sucursal s ON g.cod_cia = s.cod_cia
+                               FROM gastos g JOIN sucursal s ON g.cod_cia = s.cod_cia
                                WHERE g.codigo = ?");
     }
 
@@ -45,39 +80,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['numero_factura'])) {
     $info = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$info) {
-        echo "<script>alert('Documento no encontrado.');</script>";
-    } elseif (!isset($_FILES['archivo_pdf']) || $_FILES['archivo_pdf']['error'] !== UPLOAD_ERR_OK) {
-        echo "<script>alert('Error al subir el archivo.');</script>";
-    } else {
-        $ext = strtolower(pathinfo($_FILES['archivo_pdf']['name'], PATHINFO_EXTENSION));
-        if ($ext !== 'pdf') {
-            echo "<script>alert('Solo se permiten archivos PDF.');</script>";
-        } else {
-            $pdf_tmp = $_FILES['archivo_pdf']['tmp_name'];
-            $total = $pdo->query("SELECT COUNT(*) FROM soportes_factura")->fetchColumn();
-            $indice = 'A' . ceil(($total + 1) / 10);
-            $destino = "/data/soportes/{$numero}.pdf";
-
-            if (!move_uploaded_file($pdf_tmp, $destino)) {
-                echo "<script>alert('No se pudo mover el archivo.');</script>";
-            } else {
-                $insert = $pdo->prepare("INSERT INTO soportes_factura
-                    (numero_factura, descripcion, sucursal, fecha_emision, id_retencion, ruta_archivo, indice_archivo, tipo_documento)
-                    VALUES (:num, :desc, :suc, :fecha, :ret, :ruta, :indice, :tipo)");
-                $insert->execute([
-                    ':num' => $numero,
-                    ':desc' => $info['descripcion'],
-                    ':suc' => $info['sucursal'],
-                    ':fecha' => $info['fecha_emision'],
-                    ':ret' => $id_retencion,
-                    ':ruta' => $destino,
-                    ':indice' => $indice,
-                    ':tipo' => $tipo
-                ]);
-                echo "<script>alert('Soporte cargado con éxito.'); location.href='soportes.php';</script>";
-            }
-        }
+        echo "<script>alert('Documento no encontrado.'); window.location.href='soportes.php';</script>";
+        exit;
     }
+
+    // Guardar PDF en destino final
+    $total = $pdo->query("SELECT COUNT(*) FROM soportes_factura")->fetchColumn();
+    $indice = 'A' . ceil(($total + 1) / 10);
+    $destino = "/data/soportes/{$numero}.pdf";
+
+    if (!move_uploaded_file($pdf_tmp, $destino)) {
+        echo "<script>alert('Error al mover el archivo.'); window.location.href='soportes.php';</script>";
+        exit;
+    }
+
+    $insert = $pdo->prepare("INSERT INTO soportes_factura
+        (numero_factura, descripcion, sucursal, fecha_emision, id_retencion, ruta_archivo, indice_archivo, tipo_documento, tipo_detectado)
+        VALUES (:num, :desc, :suc, :fecha, :ret, :ruta, :indice, :tipo, :detectado)");
+    $insert->execute([
+        ':num' => $numero,
+        ':desc' => $info['descripcion'],
+        ':suc' => $info['sucursal'],
+        ':fecha' => $info['fecha_emision'],
+        ':ret' => $id_retencion,
+        ':ruta' => $destino,
+        ':indice' => $indice,
+        ':tipo' => $tipoSeleccionado,
+        ':detectado' => $tipoDetectado
+    ]);
+
+    echo "<script>alert('✅ Soporte cargado con éxito.'); window.location.href='soportes.php';</script>";
+    exit;
 }
 ?>
 
@@ -116,9 +149,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['numero_factura'])) {
         <label for="numero_factura">Número de Documento (Factura o Gasto)</label>
         <select name="numero_factura" required>
             <option value="">-- Seleccione --</option>
-
             <?php
-            // Facturas sin soporte
             $sql = "
                 SELECT f.numero_factura 
                 FROM facturas f
@@ -136,7 +167,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['numero_factura'])) {
                 echo "<option value='$val'>" . htmlspecialchars($row['numero_factura']) . " (Factura)</option>";
             }
 
-            // Gastos sin soporte (por código)
             $sql2 = "
                 SELECT g.codigo 
                 FROM gastos g

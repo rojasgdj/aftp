@@ -1,6 +1,6 @@
 <?php
 // Configuración de conexión a la base de datos
-$host = "192.168.1.6";  // IP del servidor MariaDB
+$host = "192.168.1.7";  // IP del servidor MariaDB
 $dbname = "aftp";        // Nombre de la base de datos
 $user = "root";          // Usuario de la base de datos
 $password = "cec4hkp66*"; // Contraseña de la base de datos
