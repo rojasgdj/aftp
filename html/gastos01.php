@@ -1,4 +1,17 @@
 <?php
+session_start();
+
+// Evitar caché
+header("Cache-Control: no-cache, no-store, must-revalidate");
+header("Pragma: no-cache");
+header("Expires: 0");
+
+// Verifica si hay sesión activa
+if (!isset($_SESSION['logged']) || $_SESSION['logged'] !== true) {
+    header("Location: login.php");
+    exit;
+}
+
 require 'db.php'; // Conectar a la base de datos
 ?>
 <!DOCTYPE html>

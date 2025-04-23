@@ -15,6 +15,7 @@ if (!isset($_SESSION['logged']) || $_SESSION['logged'] !== true) {
 
 require_once 'db.php';
 
+// 🧠 Clasificador ML
 function detectarTipoDocumento($archivoPdfTmp)
 {
     $cmd = escapeshellcmd("/opt/aftp-ml/env/bin/python3 /opt/aftp-ml/clasificador.py " . $archivoPdfTmp);
@@ -26,10 +27,11 @@ function detectarTipoDocumento($archivoPdfTmp)
     return null;
 }
 
-// Inicializar variables
+// 📝 Variables
 $numero = $tipoSeleccionado = $pdf_tmp = $tipoDetectado = null;
 $id_retencion = 0;
 
+// 📥 Proceso POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['numero_factura'])) {
     list($numero, $tipoSeleccionado) = explode('|', $_POST['numero_factura']);
     $id_retencion = intval($_POST['retencion']);
@@ -48,16 +50,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['numero_factura'])) {
     $pdf_tmp = $_FILES['archivo_pdf']['tmp_name'];
     $tipoDetectado = detectarTipoDocumento($pdf_tmp);
 
-    // 🚫 Validación estricta: Si el tipo no coincide, no continúa
+    // 🔒 Validación estricta
     if ($tipoDetectado && $tipoDetectado !== $tipoSeleccionado) {
         echo "<script>
-            alert('❌ El archivo cargado fue clasificado como: $tipoDetectado, pero seleccionaste: $tipoSeleccionado. Corrige la selección o sube el archivo correcto.');
+            alert('❌ El clasificador detectó: $tipoDetectado, pero seleccionaste: $tipoSeleccionado. Corrige antes de continuar.');
             window.location.href = 'soportes.php';
         </script>";
         exit;
     }
 
-    // Validar duplicado
+    // 📛 Verifica duplicado
     $check = $pdo->prepare("SELECT COUNT(*) FROM soportes_factura WHERE numero_factura = ?");
     $check->execute([$numero]);
     if ($check->fetchColumn() > 0) {
@@ -65,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['numero_factura'])) {
         exit;
     }
 
-    // Obtener datos asociados
+    // 📦 Datos del documento
     if ($tipoSeleccionado === 'factura') {
         $stmt = $pdo->prepare("SELECT f.concepto AS descripcion, s.razon_social AS sucursal, f.fecha_emision
                                FROM facturas f JOIN sucursal s ON f.cod_cia = s.cod_cia
@@ -84,9 +86,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['numero_factura'])) {
         exit;
     }
 
-    // Guardar PDF en destino final
+    // 📁 Calcular índice de carpeta
     $total = $pdo->query("SELECT COUNT(*) FROM soportes_factura")->fetchColumn();
-    $indice = 'A' . ceil(($total + 1) / 10);
+    $indiceNum = ceil(($total + 1) / 10);
+    $indice = 'A' . $indiceNum;
     $destino = "/data/soportes/{$numero}.pdf";
 
     if (!move_uploaded_file($pdf_tmp, $destino)) {
@@ -94,6 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['numero_factura'])) {
         exit;
     }
 
+    // 🧾 Insertar en BD
     $insert = $pdo->prepare("INSERT INTO soportes_factura
         (numero_factura, descripcion, sucursal, fecha_emision, id_retencion, ruta_archivo, indice_archivo, tipo_documento, tipo_detectado)
         VALUES (:num, :desc, :suc, :fecha, :ret, :ruta, :indice, :tipo, :detectado)");
@@ -109,11 +113,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['numero_factura'])) {
         ':detectado' => $tipoDetectado
     ]);
 
-    echo "<script>alert('✅ Soporte cargado con éxito.'); window.location.href='soportes.php';</script>";
+    // 📦 Verificar si completó la carpeta
+    $countStmt = $pdo->prepare("SELECT COUNT(*) FROM soportes_factura WHERE indice_archivo = ?");
+    $countStmt->execute([$indice]);
+    $count = $countStmt->fetchColumn();
+
+    if ($count == 10) {
+        $rango = $pdo->prepare("SELECT MIN(fecha_emision) AS desde, MAX(fecha_emision) AS hasta
+                                FROM soportes_factura WHERE indice_archivo = ?");
+        $rango->execute([$indice]);
+        $fechas = $rango->fetch(PDO::FETCH_ASSOC);
+        $desde = urlencode($fechas['desde']);
+        $hasta = urlencode($fechas['hasta']);
+
+        echo "<script>
+            if (confirm('📁 Se completó la carpeta $indice. ¿Deseas imprimir su etiqueta?')) {
+                window.open('etiqueta.php?indice=$indice&desde=$desde&hasta=$hasta', '_blank');
+            }
+            window.location.href = 'soportes.php';
+        </script>";
+    } else {
+        echo "<script>alert('✅ Soporte cargado con éxito.'); window.location.href='soportes.php';</script>";
+    }
+
     exit;
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
 <head>

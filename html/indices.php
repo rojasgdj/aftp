@@ -77,14 +77,78 @@ require_once 'db.php';
             padding: 8px 12px;
             border-radius: 5px;
         }
-        .menu a:hover {
-            background: #218838;
+        .etiqueta-btn {
+            float: right;
+            background: black;
+            color: white;
+            padding: 6px 10px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 999;
+            left: 0; top: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: white;
+            padding: 20px;
+            width: 400px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px #000;
+            position: relative;
+        }
+        .modal-content h3 {
+            margin-bottom: 10px;
+        }
+        .close {
+            position: absolute;
+            right: 10px; top: 10px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+        .modal-content input,
+        .modal-content textarea {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .modal-content button {
+            padding: 10px;
+            background: #007bff;
+            color: white;
+            border: none;
+            width: 100%;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .modal-content button:hover {
+            background: #0056b3;
         }
     </style>
     <script>
         function toggleIndice(id) {
             const cont = document.getElementById(id);
             cont.style.display = cont.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function abrirModal(numero) {
+            document.getElementById('numero_factura').value = numero;
+            document.getElementById('correoModal').style.display = 'flex';
+        }
+
+        function cerrarModal() {
+            document.getElementById('correoModal').style.display = 'none';
         }
     </script>
 </head>
@@ -101,8 +165,22 @@ require_once 'db.php';
 
         if ($indices) {
             foreach ($indices as $indice) {
+                $rangoStmt = $pdo->prepare("SELECT COUNT(*) AS total, MIN(fecha_emision) AS desde, MAX(fecha_emision) AS hasta
+                                            FROM soportes_factura WHERE indice_archivo = ?");
+                $rangoStmt->execute([$indice]);
+                $datos = $rangoStmt->fetch();
+
+                $btnEtiqueta = '';
+                if ($datos['total'] >= 10) {
+                    $desde = urlencode($datos['desde']);
+                    $hasta = urlencode($datos['hasta']);
+                    $btnEtiqueta = "<a class='etiqueta-btn' href='etiqueta.php?indice=$indice&desde=$desde&hasta=$hasta' target='_blank'>Etiqueta</a>";
+                }
+
                 $id = 'contenido_' . htmlspecialchars($indice);
-                echo "<div class='indice-header' onclick=\"toggleIndice('$id')\">📂 Carpeta: <strong>$indice</strong></div>";
+                echo "<div class='indice-header' onclick=\"toggleIndice('$id')\">
+                        📂 Carpeta: <strong>$indice</strong> $btnEtiqueta
+                      </div>";
                 echo "<div id='$id' class='indice-tabla'>";
 
                 $stmt2 = $pdo->prepare("
@@ -136,7 +214,10 @@ require_once 'db.php';
                         echo "<td>" . htmlspecialchars($s['sucursal']) . "</td>";
                         echo "<td>" . $fechaEmision->format('Y-m-d') . "</td>";
                         echo "<td>" . $fechaDestruccion->format('Y-m-d') . "</td>";
-                        echo "<td><a href='descargar.php?file=" . basename($s['ruta_archivo']) . "' target='_blank'>📄 Ver</a></td>";
+                        echo "<td>
+                                <a href='descargar.php?file=" . basename($s['ruta_archivo']) . "' target='_blank'>📄 Ver</a><br>
+                                <a href='#' onclick=\"abrirModal('" . htmlspecialchars($s['numero_factura']) . "')\">✉️ Enviar</a>
+                              </td>";
                         echo "</tr>";
                     }
                     echo "</table>";
@@ -153,6 +234,22 @@ require_once 'db.php';
         echo "<p style='color:red;'>Error en la consulta: " . htmlspecialchars($e->getMessage()) . "</p>";
     }
     ?>
+</div>
+
+<!-- Modal para envío de correo -->
+<div class="modal" id="correoModal">
+    <div class="modal-content">
+        <span class="close" onclick="cerrarModal()">✖</span>
+        <h3>Enviar Soporte</h3>
+        <form method="post" action="enviar_soporte.php">
+            <input type="hidden" name="numero_factura" id="numero_factura">
+            <label>Destinatario:</label>
+            <input type="email" name="email" required placeholder="correo@dominio.com">
+            <label>Mensaje:</label>
+            <textarea name="mensaje" rows="4" placeholder="Mensaje adicional..."></textarea>
+            <button type="submit">📧 Enviar Soporte</button>
+        </form>
+    </div>
 </div>
 
 </body>
