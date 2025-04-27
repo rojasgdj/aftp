@@ -25,6 +25,7 @@ require_once 'db.php';
             padding: 20px;
             text-align: center;
         }
+
         .container {
             background: white;
             max-width: 1000px;
@@ -33,6 +34,7 @@ require_once 'db.php';
             border-radius: 8px;
             box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
         }
+
         h2 {
             background: #007bff;
             color: white;
@@ -40,20 +42,24 @@ require_once 'db.php';
             border-radius: 8px 8px 0 0;
             margin-bottom: 10px;
         }
+
         table {
             width: 100%;
             margin-top: 10px;
             border-collapse: collapse;
             font-size: 14px;
         }
+
         th, td {
             border: 1px solid #ddd;
             padding: 10px;
         }
+
         th {
             background: #007bff;
             color: white;
         }
+
         .indice-header {
             background: #ffc107;
             font-weight: bold;
@@ -63,13 +69,16 @@ require_once 'db.php';
             cursor: pointer;
             border-radius: 5px;
         }
+
         .indice-tabla {
             display: none;
         }
+
         .menu {
             text-align: right;
             margin-bottom: 15px;
         }
+
         .menu a {
             background: #28a745;
             color: white;
@@ -77,6 +86,7 @@ require_once 'db.php';
             padding: 8px 12px;
             border-radius: 5px;
         }
+
         .etiqueta-btn {
             float: right;
             background: black;
@@ -98,6 +108,7 @@ require_once 'db.php';
             justify-content: center;
             align-items: center;
         }
+
         .modal-content {
             background: white;
             padding: 20px;
@@ -105,16 +116,20 @@ require_once 'db.php';
             border-radius: 8px;
             box-shadow: 0 0 10px #000;
             position: relative;
+            text-align: left;
         }
+
         .modal-content h3 {
             margin-bottom: 10px;
         }
+
         .close {
             position: absolute;
             right: 10px; top: 10px;
             font-size: 18px;
             cursor: pointer;
         }
+
         .modal-content input,
         .modal-content textarea {
             width: 100%;
@@ -123,6 +138,7 @@ require_once 'db.php';
             border: 1px solid #ccc;
             border-radius: 5px;
         }
+
         .modal-content button {
             padding: 10px;
             background: #007bff;
@@ -132,6 +148,7 @@ require_once 'db.php';
             border-radius: 5px;
             cursor: pointer;
         }
+
         .modal-content button:hover {
             background: #0056b3;
         }
@@ -165,8 +182,7 @@ require_once 'db.php';
 
         if ($indices) {
             foreach ($indices as $indice) {
-                $rangoStmt = $pdo->prepare("SELECT COUNT(*) AS total, MIN(fecha_emision) AS desde, MAX(fecha_emision) AS hasta
-                                            FROM soportes_factura WHERE indice_archivo = ?");
+                $rangoStmt = $pdo->prepare("SELECT COUNT(*) AS total, MIN(fecha_emision) AS desde, MAX(fecha_emision) AS hasta FROM soportes_factura WHERE indice_archivo = ?");
                 $rangoStmt->execute([$indice]);
                 $datos = $rangoStmt->fetch();
 
@@ -178,9 +194,7 @@ require_once 'db.php';
                 }
 
                 $id = 'contenido_' . htmlspecialchars($indice);
-                echo "<div class='indice-header' onclick=\"toggleIndice('$id')\">
-                        📂 Carpeta: <strong>$indice</strong> $btnEtiqueta
-                      </div>";
+                echo "<div class='indice-header' onclick=\"toggleIndice('$id')\">📂 Carpeta: <strong>$indice</strong> $btnEtiqueta</div>";
                 echo "<div id='$id' class='indice-tabla'>";
 
                 $stmt2 = $pdo->prepare("
@@ -202,7 +216,7 @@ require_once 'db.php';
                                 <th>Sucursal</th>
                                 <th>Fecha Emisión</th>
                                 <th>Fecha Destrucción</th>
-                                <th>Soporte PDF</th>
+                                <th>Soporte</th>
                             </tr>";
                     foreach ($soportes as $s) {
                         $fechaEmision = new DateTime($s['fecha_emision']);
@@ -236,7 +250,7 @@ require_once 'db.php';
     ?>
 </div>
 
-<!-- Modal para envío de correo -->
+<!-- Modal de correo -->
 <div class="modal" id="correoModal">
     <div class="modal-content">
         <span class="close" onclick="cerrarModal()">✖</span>
@@ -245,8 +259,8 @@ require_once 'db.php';
             <input type="hidden" name="numero_factura" id="numero_factura">
             <label>Destinatario:</label>
             <input type="email" name="email" required placeholder="correo@dominio.com">
-            <label>Mensaje:</label>
-            <textarea name="mensaje" rows="4" placeholder="Mensaje adicional..."></textarea>
+            <label>Mensaje (opcional):</label>
+            <textarea name="mensaje" rows="3"></textarea>
             <button type="submit">📧 Enviar Soporte</button>
         </form>
     </div>

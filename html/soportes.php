@@ -59,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['numero_factura'])) {
         exit;
     }
 
-    // 📛 Verifica duplicado
+    //Verifica duplicado
     $check = $pdo->prepare("SELECT COUNT(*) FROM soportes_factura WHERE numero_factura = ?");
     $check->execute([$numero]);
     if ($check->fetchColumn() > 0) {
