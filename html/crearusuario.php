@@ -1,12 +1,12 @@
 <?php
 session_start();
 
-// Evitar caché del navegador
+// Evitar caché
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Pragma: no-cache");
 header("Expires: 0");
 
-// Redirigir si el usuario ya está autenticado
+// Redirigir si ya está logueado
 if (isset($_SESSION['logged']) && $_SESSION['logged'] === true) {
     header("Location: index.php");
     exit;
@@ -21,53 +21,45 @@ if (isset($_SESSION['logged']) && $_SESSION['logged'] === true) {
   <meta name="author" content="Bits Software">
   <title>Registro de Usuario - Sistema de Control AFTP</title>
 
-  <!-- Estilos -->
-  <link href="Public/css/estilos.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css"> <!-- Correcto style.css -->
 </head>
 <body>
 
-  <div id="container">
-    <form id="registerForm" method="post" action="registrousuario.php" autocomplete="off">
-      <center>
-        <p><img src="img/aftp-logo.png" alt="Logo AFTP" width="149" height="119"></p>
-        <p>&nbsp;</p>
-        <div class="block-border">
-          <p><strong>Sistema AFTP - Registro de Usuario</strong></p>
-          <table>
-            <tr>
-              <td class="nom_campos"><label for="cedula"><b>Cédula</b></label></td>
-              <td class="dat_campos">
-                <input type="number" name="cedula" id="cedula" placeholder="Cédula" required min="1" autocomplete="off">
-              </td>
-            </tr>
-            <tr>
-              <td class="nom_campos"><label for="clave1">Contraseña</label></td>
-              <td class="dat_campos">
-                <input type="password" name="clave1" id="clave1" placeholder="Clave" required minlength="4" autocomplete="off">
-              </td>
-            </tr>
-            <tr>
-              <td class="nom_campos"><label for="clave2">Confirmar Contraseña</label></td>
-              <td class="dat_campos">
-                <input type="password" name="clave2" id="clave2" placeholder="Confirmar Clave" required minlength="4" autocomplete="off">
-              </td>
-            </tr>
-            <tr>
-              <td class="nom_campos">&nbsp;</td>
-              <td class="dat_campos">
-                <input type="submit" name="registrar" id="registrar" value="Registrar">
-              </td>
-            </tr>
-          </table>
-        </div>
-        <p><a href="login.php">Volver al inicio</a></p>
-      </center>
-    </form>
+<div class="container">
 
-    <div id="footer">
-      <h5>Copyright 2025 © Bits Software. | Design with us</h5>
-    </div>
+  <div class="titulo">
+    <img src="img/aftp-logo.png" alt="Logo AFTP" style="height: 80px;">
+    <h2>Registro de Usuario</h2>
   </div>
+
+  <form class="login-form" method="post" action="registrousuario.php" autocomplete="off">
+    <div class="form-group">
+      <label for="cedula">Cédula</label>
+      <input type="number" name="cedula" id="cedula" placeholder="Ingrese su cédula" required min="1" autocomplete="off">
+    </div>
+
+    <div class="form-group">
+      <label for="clave1">Contraseña</label>
+      <input type="password" name="clave1" id="clave1" placeholder="Ingrese su contraseña" required minlength="4" autocomplete="off">
+    </div>
+
+    <div class="form-group">
+      <label for="clave2">Confirmar Contraseña</label>
+      <input type="password" name="clave2" id="clave2" placeholder="Confirme su contraseña" required minlength="4" autocomplete="off">
+    </div>
+
+    <button type="submit" class="btn">Registrar</button>
+
+    <div class="extra-links">
+      <a href="login.php">← Volver al Inicio</a>
+    </div>
+  </form>
+
+  <div class="footer">
+    Copyright © 2025 - AFTP | Design with us
+  </div>
+
+</div>
 
 </body>
 </html>

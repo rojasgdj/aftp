@@ -90,11 +90,14 @@ function formatFecha($fecha) {
             }
         }
     </style>
-    <script>
-        window.onload = () => {
-            window.print();
-        };
-    </script>
+<script>
+window.onload = () => {
+  window.print();
+  setTimeout(() => {
+    window.close();
+  }, 100);
+};
+</script>
 </head>
 <body>
 

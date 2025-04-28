@@ -1,0 +1,431 @@
+/* ====== Reset básico ====== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+/* ====== Fondo general ====== */
+body {
+    background-color: #F5F5F7; /* Estilo fondo de Mac */
+    color: #333;
+    font-size: 16px;
+}
+
+/* ====== Contenedor Principal ====== */
+.container {
+    max-width: 1200px;
+    margin: 40px auto;
+    background: white;
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+}
+
+/* ====== Header/Título ====== */
+.titulo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(150deg, #78D1F9, #2090CD);
+    color: white;
+    padding: 20px;
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.titulo img {
+    height: 60px;
+}
+
+.menu {
+    display: flex;
+    align-items: center;
+}
+
+/* ====== Botones generales ====== */
+.btn {
+    background: linear-gradient(135deg, #78D1F9, #2090CD);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn:hover {
+    background: #2090CD;
+    transform: translateY(-2px);
+}
+
+/* ====== Botones de Pestañas (Sucursales) ====== */
+.tab-container {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.tab-container .btn {
+    background: linear-gradient(135deg, #78D1F9, #2090CD);
+}
+
+.tab-container .btn:hover {
+    background: #2090CD;
+}
+
+/* ====== Formulario tipo Card ====== */
+.login-form {
+    background: #ffffff;
+    padding: 40px 30px;
+    margin: 20px auto;
+    max-width: 400px;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.login-form .form-group {
+    margin-bottom: 20px;
+}
+
+.login-form label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #333;
+}
+
+.login-form input,
+.login-form textarea {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    outline: none;
+    transition: 0.3s;
+    font-size: 16px;
+    resize: none; /* Evitar estiramiento de textarea */
+}
+
+.login-form input:focus,
+.login-form textarea:focus {
+    border-color: #2090CD;
+    box-shadow: 0 0 5px rgba(32, 144, 205, 0.5);
+}
+
+/* Botón dentro de formularios */
+.login-form .btn {
+    background: linear-gradient(to right, #4facfe, #00f2fe);
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    width: 100%;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.login-form .btn:hover {
+    background: linear-gradient(to right, #00f2fe, #4facfe);
+}
+
+/* ====== Enlaces Extra en Formularios ====== */
+.extra-links {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.extra-links a {
+    color: #007BFF;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.extra-links a:hover {
+    text-decoration: underline;
+}
+
+/* ====== Footer ====== */
+.footer {
+    margin-top: 30px;
+    text-align: center;
+    font-size: 12px;
+    color: #666;
+}
+
+/* ====== Tabla (para listados) ====== */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    font-size: 15px;
+}
+
+th, td {
+    padding: 12px 10px;
+    border: 1px solid #e0e0e0;
+    text-align: center;
+}
+
+thead {
+    background: linear-gradient(150deg, #78D1F9, #2090CD);
+    color: white;
+    font-weight: bold;
+}
+
+tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* ====== Responsive: Menú Hamburguesa ====== */
+.menu-toggle {
+    display: none;
+    background: #2090CD;
+    color: white;
+    padding: 10px 15px;
+    font-size: 20px;
+    border: none;
+    border-radius: 8px;
+    margin: 10px auto;
+    cursor: pointer;
+}
+
+@media (max-width: 768px) {
+    .menu-toggle {
+        display: block;
+    }
+
+    .nav ul {
+        display: none;
+        flex-direction: column;
+        background: white;
+        width: 100%;
+        border-radius: 12px;
+        margin-top: 10px;
+        box-shadow: 0px 8px 16px rgba(0,0,0,0.1);
+    }
+
+    .nav ul li {
+        width: 100%;
+        text-align: center;
+        margin: 10px 0;
+    }
+
+    .nav ul li a {
+        padding: 15px 20px;
+        display: block;
+    }
+
+    .submenu {
+        position: relative;
+        top: 0;
+        left: 0;
+        transform: none;
+        box-shadow: none;
+        margin-top: 5px;
+        background: #f9f9f9;
+    }
+
+    .submenu li a {
+        padding: 10px 30px;
+    }
+}
+
+/* ====== Menú Principal Index (Restaurar) ====== */
+.nav {
+    background: #ffffff;
+    padding: 10px 0;
+}
+
+.nav ul {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.nav ul li {
+    margin: 0 15px;
+    position: relative;
+}
+
+.nav ul li a {
+    text-decoration: none;
+    color: #2090CD;
+    font-weight: 600;
+    padding: 10px 20px;
+    border-radius: 12px;
+    transition: background 0.3s, color 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.nav ul li a:hover {
+    background: #2090CD;
+    color: white;
+}
+
+/* ====== Submenús Index ====== */
+.submenu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    min-width: 220px;
+    padding: 10px 0;
+    border-radius: 12px;
+    box-shadow: 0px 8px 16px rgba(0,0,0,0.1);
+    z-index: 10;
+    transition: all 0.3s ease;
+    opacity: 0;
+    visibility: hidden;
+}
+
+.nav ul li:hover .submenu {
+    display: block;
+    opacity: 1;
+    visibility: visible;
+}
+
+.submenu li {
+    width: 100%;
+}
+
+.submenu li a {
+    padding: 10px 20px;
+    font-size: 14px;
+    color: #2090CD;
+}
+
+.submenu li a:hover {
+    background-color: #78D1F9;
+    color: white;
+    border-radius: 8px;
+}
+
+/* ====== Responsive para Index ====== */
+@media (max-width: 768px) {
+    .nav ul {
+        flex-direction: column;
+    }
+
+    .submenu {
+        position: relative;
+        transform: none;
+        box-shadow: none;
+        margin-top: 5px;
+        background: #f9f9f9;
+    }
+}
+
+.content {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.content.active {
+    display: block;
+    opacity: 1;
+}
+
+select {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    appearance: none; /* quitar flecha por defecto */
+    background: white;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+select option {
+    white-space: normal; /* Para que dentro del desplegable sí puedan ver completo si quieren */
+}
+
+.login-form select {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: white;
+    font-size: 16px;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+.login-form select:focus {
+    border-color: #2090CD;
+    box-shadow: 0 0 5px rgba(32, 144, 205, 0.5);
+}
+
+/* Solución select muy largo */
+.login-form select {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+/* Evitar desbordes en selects largos */
+.login-form select {
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Al abrir el desplegable, permitir líneas largas normales */
+.login-form select option {
+    white-space: normal;
+    word-break: break-word;
+}
+
+/* Estilos para el botón hamburguesa */
+.menu-toggle {
+    display: none;
+    background: #2090CD;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 18px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/*Mostrar botón en pantallas pequeñas */
+@media (max-width: 768px) {
+    .menu-toggle {
+        display: block;
+    }
+    .nav ul {
+        display: none;
+        flex-direction: column;
+        background: white;
+        width: 100%;
+        margin-top: 10px;
+        border-radius: 12px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+    .nav ul.show {
+        display: flex;
+    }
+    .nav ul li {
+        margin: 10px 0;
+    }
+}

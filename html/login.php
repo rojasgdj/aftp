@@ -1,12 +1,12 @@
 <?php
 session_start();
 
-// Evitar caché del navegador
+// Evitar caché
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Pragma: no-cache");
 header("Expires: 0");
 
-// Redirigir si el usuario ya está autenticado
+// Redirigir si ya está logueado
 if (isset($_SESSION['logged']) && $_SESSION['logged'] === true) {
     header("Location: index.php");
     exit;
@@ -17,60 +17,49 @@ if (isset($_SESSION['logged']) && $_SESSION['logged'] === true) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Sistema de Control AFTP - Inicio de sesión">
-  <meta name="author" content="AFTP">
   <title>Iniciar Sesión - Sistema de Control de Archivo</title>
-
-  <!-- Estilos -->
-  <link href="Public/css/estilos.css" rel="stylesheet">
-
+  <link rel="stylesheet" href="css/style.css"> <!-- Tu nuevo style.css -->
 </head>
 <body>
 
-  <div id="container">
-    <form id="loginForm" method="post" action="iniciasesion.php" autocomplete="off">
-      <center>
-        <p><img src="img/aftp-logo.png" alt="Logo AFTP" width="149" height="119"></p>
-        <p>&nbsp;</p>
-        <div class="block-border">
-          <p><strong>Sistema AFTP - Inicio de sesión</strong></p>
-          <table>
-            <tr>
-              <td class="nom_campos"><label for="cedula"><b>Cédula</b></label></td>
-              <td class="dat_campos">
-                <input type="number" name="cedula" id="cedula" placeholder="Cédula" required min="1" autocomplete="off">
-              </td>
-            </tr>
-            <tr>
-              <td class="nom_campos"><label for="clave1">Contraseña</label></td>
-              <td class="dat_campos">
-                <input type="password" name="clave1" id="clave1" placeholder="Clave" required minlength="4" autocomplete="off">
-              </td>
-            </tr>
-            <tr>
-              <td class="nom_campos">&nbsp;</td>
-              <td class="dat_campos">
-                <input type="submit" name="enviar" id="enviar" value="Iniciar sesión">
-              </td>
-            </tr>
-          </table>
-        </div>
-        <p><a href="crearusuario.php">Registrarse</a></p>
-        <p><a href="AFTP.pdf">Manual de uso</a></p>
-      </center>
-    </form>
+<div class="container">
 
-    <div id="footer">
-      <h5>Copyright 2025 © AFTP. | Design with us</h5>
-    </div>
+  <div class="titulo">
+    <img src="img/aftp-logo.png" alt="Logo AFTP" style="height: 80px;">
+    <h2>Iniciar Sesión</h2>
   </div>
 
-  <script>
-    window.onload = function() {
-      document.getElementById("cedula").value = "";
-      document.getElementById("clave1").value = "";
-    };
-  </script>
+  <form class="login-form" method="post" action="iniciasesion.php" autocomplete="off">
+    <div class="form-group">
+      <label for="cedula">Cédula</label>
+      <input type="number" name="cedula" id="cedula" placeholder="Ingrese su cédula" required min="1" autocomplete="off">
+    </div>
+
+    <div class="form-group">
+      <label for="clave1">Contraseña</label>
+      <input type="password" name="clave1" id="clave1" placeholder="Ingrese su contraseña" required minlength="4" autocomplete="off">
+    </div>
+
+    <button type="submit" class="btn">Iniciar Sesión</button>
+
+    <div class="extra-links">
+      <a href="crearusuario.php">¿No tienes cuenta? Regístrate aquí</a><br>
+      <a href="AFTP.pdf" target="_blank">📄 Ver Manual de Usuario</a>
+    </div>
+  </form>
+
+  <div class="footer">
+    Copyright © 2025 - AFTP | Design with us
+  </div>
+
+</div>
+
+<script>
+  window.onload = function() {
+    document.getElementById("cedula").value = "";
+    document.getElementById("clave1").value = "";
+  };
+</script>
 
 </body>
 </html>

@@ -33,175 +33,183 @@ $porcDisc = $total > 0 ? round(($discrepan * 100) / $total, 1) : 0;
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema Administrativo AFTP - Menú Principal</title>
-
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
-        body { background-color: #f4f4f4; margin: 0; padding: 0; }
-        .container { max-width: 1200px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
-        .titulo { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #007bff; color: white; border-radius: 8px 8px 0 0; }
-        .titulo img { height: 50px; }
-        .menu { text-align: right; }
-        .menu a { text-decoration: none; color: white; font-weight: bold; background: red; padding: 8px 12px; border-radius: 5px; display: inline-block; }
-        .menu a:hover { background: darkred; }
-
-        .nav { background: #343a40; border-radius: 0 0 8px 8px; }
-        .nav ul { list-style: none; padding: 0; display: flex; justify-content: center; position: relative; }
-        .nav ul li { position: relative; padding: 15px; }
-        .nav ul li a { color: white; text-decoration: none; font-size: 16px; display: block; cursor: pointer; }
-        .nav ul li:hover { background: #495057; }
-        .nav ul li ul.submenu { display: none; position: absolute; background: #495057; min-width: 200px; top: 100%; left: 0; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); padding: 0; }
-        .nav ul li ul.submenu li { display: block; text-align: left; }
-        .nav ul li ul.submenu li a { padding: 10px; font-size: 14px; display: block; color: white; }
-        .nav ul li ul.submenu li a:hover { background: #007bff; }
-
-        @media (max-width: 768px) {
-            .titulo { flex-direction: column; text-align: center; }
-            .menu { text-align: center; width: 100%; margin-top: 10px; }
-            .nav ul { flex-direction: column; text-align: left; }
-            .nav ul li { width: 100%; }
-            .nav ul li ul.submenu { position: relative; width: 100%; }
-        }
-
-        .dashboard {
-            background: white;
-            padding: 30px;
-            margin: 30px auto;
-            width: 90%;
-            max-width: 900px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            text-align: center;
-        }
-
-        .dashboard p {
-            margin: 10px 0;
-            font-size: 16px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema Administrativo AFTP - Menú Principal</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/chart.min.js"></script>
+  <script src="js/feather.min.js"></script>
+  <style>
+    .dashboard h3 {
+        margin-top: 40px;
+        margin-bottom: 30px;
+        text-align: center;
+        font-size: 26px;
+        color: #2090CD;
+    }
+    .info-box {
+        margin-top: 30px;
+        padding: 20px;
+        border: 2px solid #007BFF;
+        border-radius: 8px;
+        text-align: center;
+        background: #f9f9f9;
+        font-size: 16px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .info-box p {
+        margin: 10px 0;
+    }
+    .success {
+        color: green;
+        font-weight: bold;
+    }
+    .danger {
+        color: red;
+        font-weight: bold;
+    }
+    #graficoDona {
+        max-width: 300px;
+        margin: 0 auto;
+    }
+    .leyenda-dona {
+        margin-bottom: 10px;
+        text-align: center;
+        font-weight: bold;
+        color: #555;
+    }
+  </style>
 </head>
 <body>
+
 <div class="container">
-    <div class="titulo">
-        <img src="img/aftp-logo.png" alt="Logo">
-        <h2>Sistema de Control de Archivo</h2>
-        <div class="menu"><a href="logout.php">Cerrar sesión</a></div>
-    </div>
 
-    <nav class="nav">
-        <ul>
-            <li><a href="#" class="menu-toggle">Fichas de Registros ▼</a>
-                <ul class="submenu">
-                    <li><a href="cia01.php">Sucursales</a></li>
-                    <li><a href="clientes01.php">Clientes</a></li>
-                    <li><a href="proveedores01.php">Proveedores</a></li>
-                </ul>
-            </li>
-            <li><a href="#" class="menu-toggle">Ingreso de Facturas ▼</a>
-                <ul class="submenu">
-                    <li><a href="factura01.php">Ingreso de Factura</a></li>
-                    <li><a href="buscarfactura.php">Consulta de Factura</a></li>
-                </ul>
-            </li>
-            <li><a href="#" class="menu-toggle">Gastos ▼</a>
-                <ul class="submenu">
-                    <li><a href="gastos01.php">Ingreso de Gastos</a></li>
-                </ul>
-            </li>
-            <li><a href="#" class="menu-toggle">Reportes ▼</a>
-                <ul class="submenu">
-                    <li><a href="reportefacturas.php">Facturas Recibidas</a></li>
-                    <li><a href="reportegastos.php">Gastos Recibidos</a></li>
-                    <li><a href="reporteprov.php">Listado de Proveedores</a></li>
-                </ul>
-            </li>
-            <li><a href="#" class="menu-toggle">AFTP ▼</a>
-                <ul class="submenu">
-                    <li><a href="soportes.php">Cargar Soporte</a></li>
-                    <li><a href="buscarsoporte.php">Buscar Soporte</a></li>
-                    <li><a href="indices.php">Índices de Soportes</a></li>
-                </ul>
-            </li>
+  <div class="titulo">
+    <img src="img/aftp-logo.png" alt="Logo AFTP">
+    <h2>Sistema de Control de Archivo</h2>
+    <div class="menu">
+      <button class="menu-toggle" onclick="toggleMenu()">☰ Menú</button> <!-- 🔥 Botón hamburguesa agregado -->
+      <a href="logout.php" class="btn">Cerrar sesión</a>
+    </div>
+  </div>
+
+  <nav class="nav">
+    <ul>
+      <li><a href="#"><i data-feather="folder"></i> Fichas ▼</a>
+        <ul class="submenu">
+          <li><a href="cia01.php"><i data-feather="home"></i> Sucursales</a></li>
+          <li><a href="clientes01.php"><i data-feather="users"></i> Clientes</a></li>
+          <li><a href="proveedores01.php"><i data-feather="truck"></i> Proveedores</a></li>
         </ul>
-    </nav>
+      </li>
+      <li><a href="#"><i data-feather="file-text"></i> Facturas ▼</a>
+        <ul class="submenu">
+          <li><a href="factura01.php"><i data-feather="plus-square"></i> Ingreso</a></li>
+          <li><a href="buscarfactura.php?origen=index.php"><i data-feather="search"></i> Buscar Factura</a></li>
+        </ul>
+      </li>
+      <li><a href="#"><i data-feather="credit-card"></i> Gastos ▼</a>
+        <ul class="submenu">
+          <li><a href="gastos01.php"><i data-feather="dollar-sign"></i> Ingreso de Gastos</a></li>
+        </ul>
+      </li>
+      <li><a href="#"><i data-feather="bar-chart-2"></i> Reportes ▼</a>
+        <ul class="submenu">
+          <li><a href="reportefacturas.php"><i data-feather="file"></i> Facturas Recibidas</a></li>
+          <li><a href="reportegastos.php"><i data-feather="file-minus"></i> Gastos Recibidos</a></li>
+          <li><a href="reporteprov.php"><i data-feather="file-text"></i> Listado de Proveedores</a></li>
+        </ul>
+      </li>
+      <li><a href="#"><i data-feather="archive"></i> AFTP ▼</a>
+        <ul class="submenu">
+          <li><a href="soportes.php"><i data-feather="upload-cloud"></i> Cargar Soporte</a></li>
+          <li><a href="buscarsoporte.php"><i data-feather="search"></i> Buscar Soporte</a></li>
+          <li><a href="indices.php"><i data-feather="layers"></i> Índices</a></li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
 
-    <!-- Dashboard ML -->
-    <div class="dashboard">
-    <h3>Dashboard Clasificador</h3>
+  <div class="dashboard">
+    <h3>Dashboard Clasificador ML</h3>
+
     <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 30px;">
-        <div style="flex: 1 1 250px;"><canvas id="graficoDona"></canvas></div>
-        <div style="flex: 1 1 250px;">
-            <canvas id="graficoProveedores"></canvas>
-            <!-- Resumen debajo del gráfico de barras -->
-            <div style="margin-top: 20px; border: 2px solid black; border-radius: 8px; padding: 15px; font-size: 16px;">
-                <p><strong>Total de Soportes:</strong> <?= $total ?></p>
-                <p style="color: green;">Coincidencias: <?= $coinciden ?> (<?= $porcCoin ?>%)</p>
-                <p style="color: red;">Discrepancias: <?= $discrepan ?> (<?= $porcDisc ?>%)</p>
-            </div>
+      <div style="flex: 1 1 250px; text-align: center;">
+        <div class="leyenda-dona">Clasificación de Soportes</div>
+        <canvas id="graficoDona"></canvas>
+      </div>
+
+      <div style="flex: 1 1 250px; text-align: center;">
+        <canvas id="graficoProveedores"></canvas>
+
+        <div class="info-box">
+          <p><i data-feather="file"></i> <strong>Total de Soportes:</strong> <?= $total ?></p>
+          <p class="success"><i data-feather="check-circle"></i> Coincidencias: <?= $coinciden ?> (<?= $porcCoin ?>%)</p>
+          <p class="danger"><i data-feather="x-circle"></i> Discrepancias: <?= $discrepan ?> (<?= $porcDisc ?>%)</p>
         </div>
+      </div>
     </div>
+  </div>
+
 </div>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <script>
+function toggleMenu() {
+    const nav = document.querySelector('.nav ul');
+    nav.classList.toggle('show');
+}
+
 const ctxDona = document.getElementById('graficoDona').getContext('2d');
 new Chart(ctxDona, {
-    type: 'doughnut',
-    data: {
-        labels: ['Coinciden', 'Discrepancias'],
-        datasets: [{
-            label: 'Clasificación',
-            data: [<?= $coinciden ?>, <?= $discrepan ?>],
-            backgroundColor: ['#28a745', '#dc3545']
-        }]
-    },
-    options: {
-        plugins: {
-            title: { display: true, text: 'Precisión del Clasificador ML' }
+  type: 'doughnut',
+  data: {
+    labels: ['Coinciden', 'Discrepancias'],
+    datasets: [{
+      data: [<?= $coinciden ?>, <?= $discrepan ?>],
+      backgroundColor: ['#2090CD', '#FF6B6B'],
+      borderColor: '#fff',
+      borderWidth: 2
+    }]
+  },
+  options: {
+    plugins: {
+      legend: {
+        display: true,
+        position: 'bottom',
+        labels: {
+          color: '#333',
+          font: { size: 14 }
         }
+      }
     }
+  }
 });
 
 const ctxProv = document.getElementById('graficoProveedores').getContext('2d');
 new Chart(ctxProv, {
-    type: 'bar',
-    data: {
-        labels: <?= $labelsProveedores ?>,
-        datasets: [{
-            label: 'Discrepancias',
-            data: <?= $valoresProveedores ?>,
-            backgroundColor: '#007bff'
-        }]
+  type: 'bar',
+  data: {
+    labels: <?= $labelsProveedores ?>,
+    datasets: [{
+      label: 'Discrepancias',
+      data: <?= $valoresProveedores ?>,
+      backgroundColor: '#4DB7E8',
+      borderRadius: 10
+    }]
+  },
+  options: {
+    plugins: {
+      legend: { display: false },
+      title: { display: false }
     },
-    options: {
-        plugins: {
-            title: { display: true, text: 'Proveedores con más discrepancias' }
-        },
-        scales: {
-            y: { beginAtZero: true }
-        }
+    scales: {
+      x: { ticks: { color: '#666' } },
+      y: { ticks: { color: '#666' }, beginAtZero: true }
     }
+  }
 });
+feather.replace();
 </script>
 
-<script>
-document.querySelectorAll('.menu-toggle').forEach(item => {
-    item.addEventListener('click', function (event) {
-        event.preventDefault();
-        let submenu = this.nextElementSibling;
-        document.querySelectorAll('.submenu').forEach(menu => {
-            if (menu !== submenu) menu.style.display = 'none';
-        });
-        submenu.style.display = submenu.style.display === 'block' ? 'none' : 'block';
-    });
-});
-document.addEventListener('click', function (event) {
-    let isClickInsideMenu = event.target.closest('.nav ul li');
-    if (!isClickInsideMenu) {
-        document.querySelectorAll('.submenu').forEach(menu => menu.style.display = 'none');
-    }
-});
-</script>
 </body>
 </html>

@@ -20,80 +20,32 @@ require_once "db.php";
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reporte de Proveedores</title>
-    <style>
-        * {
-            font-family: Arial, sans-serif;
-            box-sizing: border-box;
-        }
-        body {
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 20px;
-            text-align: center;
-        }
-        .container {
-            max-width: 1100px;
-            margin: auto;
-            background: #fff;
-            padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        h2 {
-            color: #007bff;
-            margin-bottom: 20px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 14px;
-            margin-top: 15px;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 10px;
-        }
-        th {
-            background-color: #007bff;
-            color: white;
-        }
-        td {
-            text-align: center;
-        }
-        .fecha {
-            margin-top: 15px;
-            font-size: 13px;
-            color: #666;
-        }
-        .btn {
-            display: inline-block;
-            margin: 10px 5px 0;
-            padding: 10px 20px;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .btn-print {
-            background-color: #007bff;
-        }
-        .btn-print:hover {
-            background-color: #0056b3;
-        }
-        .btn-back {
-            background-color: #28a745;
-        }
-        .btn-back:hover {
-            background-color: #218838;
-        }
-    </style>
+
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/feather.min.js"></script> <!-- Feather Icons -->
 </head>
 <body>
 
 <div class="container">
-    <h2>📋 Reporte de Proveedores</h2>
 
+  <!-- Título -->
+  <div class="titulo">
+    <img src="img/aftp-logo.png" alt="Logo AFTP" style="height: 60px;">
+    <h2>Reporte de Proveedores</h2>
+  </div>
+
+  <!-- Botones -->
+  <div style="margin-top: 20px; display: flex; justify-content: space-between; flex-wrap: wrap;">
+    <a href="index.php" class="btn">
+      <i data-feather="arrow-left"></i> Volver al Menú
+    </a>
+    <button class="btn" onclick="window.print()">
+      <i data-feather="printer"></i> Imprimir
+    </button>
+  </div>
+
+  <!-- Listado -->
+  <div style="overflow-x: auto; margin-top: 20px;">
     <?php
     try {
         $stmt = $pdo->query("
@@ -104,13 +56,13 @@ require_once "db.php";
 
         if ($stmt->rowCount() > 0) {
             echo "<table>";
-            echo "<tr>
+            echo "<thead><tr>
                     <th>Código</th>
                     <th>RIF / NIT</th>
                     <th>Razón Social</th>
                     <th>Teléfono</th>
                     <th>Contacto</th>
-                  </tr>";
+                  </tr></thead><tbody>";
 
             while ($prov = $stmt->fetch(PDO::FETCH_ASSOC)) {
                 echo "<tr>";
@@ -121,7 +73,7 @@ require_once "db.php";
                 echo "<td>" . htmlspecialchars($prov['contacto']) . "</td>";
                 echo "</tr>";
             }
-            echo "</table>";
+            echo "</tbody></table>";
         } else {
             echo "<p>No hay proveedores registrados.</p>";
         }
@@ -129,12 +81,18 @@ require_once "db.php";
         echo "<p>Error en la consulta: " . htmlspecialchars($e->getMessage()) . "</p>";
     }
     ?>
+  </div>
 
-    <p class="fecha">Fecha del reporte: <?= date("d-m-Y H:i:s") ?></p>
+  <!-- Fecha reporte -->
+  <p style="margin-top: 20px; font-size: 13px; color: #666;">
+    Fecha del reporte: <?= date("d-m-Y H:i:s") ?>
+  </p>
 
-    <button class="btn btn-print" onclick="window.print()">🖨️ Imprimir</button>
-    <button class="btn btn-back" onclick="window.location.href='index.php'">🏠 Volver al Menú</button>
 </div>
+
+<script>
+  feather.replace(); // Activar Feather Icons
+</script>
 
 </body>
 </html>

@@ -16,255 +16,246 @@ require_once 'db.php';
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Índices de Soportes</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f4f4f4;
-            padding: 20px;
-            text-align: center;
-        }
-
-        .container {
-            background: white;
-            max-width: 1000px;
-            margin: auto;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
-        }
-
-        h2 {
-            background: #007bff;
-            color: white;
-            padding: 15px;
-            border-radius: 8px 8px 0 0;
-            margin-bottom: 10px;
-        }
-
-        table {
-            width: 100%;
-            margin-top: 10px;
-            border-collapse: collapse;
-            font-size: 14px;
-        }
-
-        th, td {
-            border: 1px solid #ddd;
-            padding: 10px;
-        }
-
-        th {
-            background: #007bff;
-            color: white;
-        }
-
-        .indice-header {
-            background: #ffc107;
-            font-weight: bold;
-            padding: 10px;
-            text-align: left;
-            margin-top: 10px;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-
-        .indice-tabla {
-            display: none;
-        }
-
-        .menu {
-            text-align: right;
-            margin-bottom: 15px;
-        }
-
-        .menu a {
-            background: #28a745;
-            color: white;
-            text-decoration: none;
-            padding: 8px 12px;
-            border-radius: 5px;
-        }
-
-        .etiqueta-btn {
-            float: right;
-            background: black;
-            color: white;
-            padding: 6px 10px;
-            text-decoration: none;
-            border-radius: 4px;
-            font-size: 13px;
-        }
-
-        /* Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 999;
-            left: 0; top: 0;
-            width: 100%; height: 100%;
-            background-color: rgba(0,0,0,0.5);
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-content {
-            background: white;
-            padding: 20px;
-            width: 400px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px #000;
-            position: relative;
-            text-align: left;
-        }
-
-        .modal-content h3 {
-            margin-bottom: 10px;
-        }
-
-        .close {
-            position: absolute;
-            right: 10px; top: 10px;
-            font-size: 18px;
-            cursor: pointer;
-        }
-
-        .modal-content input,
-        .modal-content textarea {
-            width: 100%;
-            padding: 8px;
-            margin: 5px 0 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        .modal-content button {
-            padding: 10px;
-            background: #007bff;
-            color: white;
-            border: none;
-            width: 100%;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .modal-content button:hover {
-            background: #0056b3;
-        }
-    </style>
-    <script>
-        function toggleIndice(id) {
-            const cont = document.getElementById(id);
-            cont.style.display = cont.style.display === 'none' ? 'block' : 'none';
-        }
-
-        function abrirModal(numero) {
-            document.getElementById('numero_factura').value = numero;
-            document.getElementById('correoModal').style.display = 'flex';
-        }
-
-        function cerrarModal() {
-            document.getElementById('correoModal').style.display = 'none';
-        }
-    </script>
+  <meta charset="UTF-8">
+  <title>Índices de Soportes</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .grid-carpetas {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 30px;
+      margin-top: 30px;
+    }
+    .carpeta-box {
+      background: #ffffff;
+      border-radius: 12px;
+      text-align: center;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      transition: 0.3s;
+    }
+    .carpeta-box:hover {
+      transform: translateY(-5px);
+    }
+    .carpeta-box img {
+      width: 70px;
+      cursor: pointer;
+    }
+    .indice-texto {
+      font-weight: bold;
+      margin-top: 10px;
+    }
+    .btn-etiqueta {
+      background: #2090CD;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 8px;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+    .btn-etiqueta:hover {
+      background: #007bff;
+    }
+    .modal, .modal-envio {
+      display: none;
+      position: fixed;
+      z-index: 999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.6);
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content, .modal-envio-content {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      position: relative;
+      max-height: 90%;
+      overflow-y: auto;
+    }
+    .modal-content {
+      width: 90%;
+      max-width: 900px;
+    }
+    .modal-envio-content {
+      width: 400px;
+      text-align: center;
+    }
+    .close {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      font-size: 24px;
+      cursor: pointer;
+      color: #f00;
+    }
+    table {
+      width: 100%;
+      margin-top: 15px;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ddd;
+    }
+    th {
+      background: linear-gradient(150deg, #78D1F9, #2090CD);
+      color: #fff;
+    }
+    .btn-mini {
+      background: #2090CD;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      color: white;
+      font-size: 12px;
+      font-weight: bold;
+      cursor: pointer;
+      margin: 2px;
+    }
+    .btn-mini:hover {
+      background: #007bff;
+    }
+    .modal-envio-content input, .modal-envio-content textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+  </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="menu"><a href="index.php">⬅ Volver al Menú</a></div>
-    <h2>Soportes Agrupados por Índice (Carpetas)</h2>
 
+  <div class="titulo">
+    <img src="img/aftp-logo.png" alt="Logo AFTP" style="height: 70px;">
+    <h2>Índices de Soportes</h2>
+  </div>
+
+  <div style="margin-top: 20px; text-align: left;">
+    <a href="index.php" class="btn">← Volver al Menú</a>
+  </div>
+
+  <div class="grid-carpetas">
     <?php
-    try {
-        $stmt = $pdo->query("SELECT DISTINCT indice_archivo FROM soportes_factura ORDER BY indice_archivo");
-        $indices = $stmt->fetchAll(PDO::FETCH_COLUMN);
+    $stmt = $pdo->query("SELECT DISTINCT indice_archivo FROM soportes_factura ORDER BY indice_archivo");
+    $indices = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-        if ($indices) {
-            foreach ($indices as $indice) {
-                $rangoStmt = $pdo->prepare("SELECT COUNT(*) AS total, MIN(fecha_emision) AS desde, MAX(fecha_emision) AS hasta FROM soportes_factura WHERE indice_archivo = ?");
-                $rangoStmt->execute([$indice]);
-                $datos = $rangoStmt->fetch();
+    foreach ($indices as $indice):
+      $contenidoId = "contenido_" . htmlspecialchars($indice);
+      $rango = $pdo->prepare("SELECT COUNT(*) AS total, MIN(fecha_emision) AS desde, MAX(fecha_emision) AS hasta FROM soportes_factura WHERE indice_archivo = ?");
+      $rango->execute([$indice]);
+      $datos = $rango->fetch();
 
-                $btnEtiqueta = '';
-                if ($datos['total'] >= 10) {
-                    $desde = urlencode($datos['desde']);
-                    $hasta = urlencode($datos['hasta']);
-                    $btnEtiqueta = "<a class='etiqueta-btn' href='etiqueta.php?indice=$indice&desde=$desde&hasta=$hasta' target='_blank'>Etiqueta</a>";
-                }
-
-                $id = 'contenido_' . htmlspecialchars($indice);
-                echo "<div class='indice-header' onclick=\"toggleIndice('$id')\">📂 Carpeta: <strong>$indice</strong> $btnEtiqueta</div>";
-                echo "<div id='$id' class='indice-tabla'>";
-
-                $stmt2 = $pdo->prepare("
-                    SELECT sf.numero_factura, sf.descripcion, sf.sucursal, sf.fecha_emision, 
-                           sf.ruta_archivo, pr.anios_retencion
-                    FROM soportes_factura sf
-                    INNER JOIN politicas_retencion pr ON sf.id_retencion = pr.id_retencion
-                    WHERE sf.indice_archivo = ?
-                    ORDER BY sf.fecha_emision DESC
-                ");
-                $stmt2->execute([$indice]);
-                $soportes = $stmt2->fetchAll();
-
-                if ($soportes) {
-                    echo "<table>
-                            <tr>
-                                <th>Número</th>
-                                <th>Descripción</th>
-                                <th>Sucursal</th>
-                                <th>Fecha Emisión</th>
-                                <th>Fecha Destrucción</th>
-                                <th>Soporte</th>
-                            </tr>";
-                    foreach ($soportes as $s) {
-                        $fechaEmision = new DateTime($s['fecha_emision']);
-                        $fechaDestruccion = (clone $fechaEmision)->modify('+' . $s['anios_retencion'] . ' years');
-
-                        echo "<tr>";
-                        echo "<td>" . htmlspecialchars($s['numero_factura']) . "</td>";
-                        echo "<td>" . htmlspecialchars($s['descripcion']) . "</td>";
-                        echo "<td>" . htmlspecialchars($s['sucursal']) . "</td>";
-                        echo "<td>" . $fechaEmision->format('Y-m-d') . "</td>";
-                        echo "<td>" . $fechaDestruccion->format('Y-m-d') . "</td>";
-                        echo "<td>
-                                <a href='descargar.php?file=" . basename($s['ruta_archivo']) . "' target='_blank'>📄 Ver</a><br>
-                                <a href='#' onclick=\"abrirModal('" . htmlspecialchars($s['numero_factura']) . "')\">✉️ Enviar</a>
-                              </td>";
-                        echo "</tr>";
-                    }
-                    echo "</table>";
-                } else {
-                    echo "<p>📭 Sin soportes en esta carpeta.</p>";
-                }
-
-                echo "</div>";
-            }
-        } else {
-            echo "<p>No hay soportes registrados aún.</p>";
-        }
-    } catch (PDOException $e) {
-        echo "<p style='color:red;'>Error en la consulta: " . htmlspecialchars($e->getMessage()) . "</p>";
-    }
+      $desde = urlencode($datos['desde']);
+      $hasta = urlencode($datos['hasta']);
     ?>
+      <div class="carpeta-box">
+        <img src="img/carpeta.png" alt="Carpeta" onclick="mostrarModal('<?= $contenidoId ?>')">
+        <div class="indice-texto"><?= htmlspecialchars($indice) ?></div>
+        <?php if ($datos['total'] >= 10): ?>
+            <button class="btn-etiqueta" onclick="imprimirEtiqueta('<?= htmlspecialchars($indice) ?>', '<?= $desde ?>', '<?= $hasta ?>')">Etiqueta</button>
+        <?php endif; ?>
+      </div>
+    <?php endforeach; ?>
+  </div>
+
+  <?php foreach ($indices as $indice):
+    $contenidoId = "contenido_" . htmlspecialchars($indice);
+  ?>
+    <div id="<?= $contenidoId ?>" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="cerrarModal('<?= $contenidoId ?>')">&times;</span>
+        <h3>📂 Carpeta: <?= htmlspecialchars($indice) ?></h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Número</th>
+              <th>Descripción</th>
+              <th>Sucursal</th>
+              <th>Fecha Emisión</th>
+              <th>Fecha Destrucción</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php
+            $stmt2 = $pdo->prepare("
+              SELECT sf.numero_factura, sf.descripcion, sf.sucursal, sf.fecha_emision,
+                     pr.anios_retencion, sf.ruta_archivo
+              FROM soportes_factura sf
+              INNER JOIN politicas_retencion pr ON sf.id_retencion = pr.id_retencion
+              WHERE sf.indice_archivo = ?
+              ORDER BY sf.fecha_emision DESC
+            ");
+            $stmt2->execute([$indice]);
+            foreach ($stmt2->fetchAll() as $s):
+              $fechaEmision = new DateTime($s['fecha_emision']);
+              $fechaDestruccion = (clone $fechaEmision)->modify('+' . $s['anios_retencion'] . ' years');
+            ?>
+              <tr>
+                <td><?= htmlspecialchars($s['numero_factura']) ?></td>
+                <td><?= htmlspecialchars($s['descripcion']) ?></td>
+                <td><?= htmlspecialchars($s['sucursal']) ?></td>
+                <td><?= $fechaEmision->format('Y-m-d') ?></td>
+                <td><?= $fechaDestruccion->format('Y-m-d') ?></td>
+                <td>
+                  <a href="descargar.php?file=<?= urlencode(basename($s['ruta_archivo'])) ?>" target="_blank">
+                    <button class="btn-mini">📄 Ver</button>
+                  </a>
+                  <button class="btn-mini" onclick="abrirModalEnvio('<?= htmlspecialchars($s['numero_factura']) ?>')">✉️ Enviar</button>
+                </td>
+              </tr>
+            <?php endforeach; ?>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  <?php endforeach; ?>
+
+  <div class="modal-envio" id="modalEnvio">
+    <div class="modal-envio-content">
+      <span class="close" onclick="cerrarModalEnvio()">&times;</span>
+      <h3>📧 Enviar Soporte</h3>
+      <form method="post" action="enviar_soporte.php">
+        <input type="hidden" name="numero_factura" id="numero_factura_envio">
+        <input type="email" name="correo_destino" placeholder="Correo destinatario" required>
+        <textarea name="mensaje" placeholder="Mensaje adicional (opcional)" rows="4"></textarea>
+        <button type="submit" class="btn">Enviar</button>
+      </form>
+    </div>
+  </div>
+
 </div>
 
-<!-- Modal de correo -->
-<div class="modal" id="correoModal">
-    <div class="modal-content">
-        <span class="close" onclick="cerrarModal()">✖</span>
-        <h3>Enviar Soporte</h3>
-        <form method="post" action="enviar_soporte.php">
-            <input type="hidden" name="numero_factura" id="numero_factura">
-            <label>Destinatario:</label>
-            <input type="email" name="email" required placeholder="correo@dominio.com">
-            <label>Mensaje (opcional):</label>
-            <textarea name="mensaje" rows="3"></textarea>
-            <button type="submit">📧 Enviar Soporte</button>
-        </form>
-    </div>
-</div>
+<script>
+function mostrarModal(id) {
+  document.getElementById(id).style.display = 'flex';
+}
+function cerrarModal(id) {
+  document.getElementById(id).style.display = 'none';
+}
+function abrirModalEnvio(numero) {
+  document.getElementById('numero_factura_envio').value = numero;
+  document.getElementById('modalEnvio').style.display = 'flex';
+}
+function cerrarModalEnvio() {
+  document.getElementById('modalEnvio').style.display = 'none';
+}
+function imprimirEtiqueta(indice, desde, hasta) {
+  const url = `etiqueta.php?indice=${indice}&desde=${desde}&hasta=${hasta}`;
+  window.open(url, '_blank'); // Se abre como reporte_facturas
+}
+</script>
 
 </body>
 </html>
