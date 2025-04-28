@@ -18,7 +18,7 @@ require_once "db.php";
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Reporte de Gastos Recibidos</title>
+  <title>Reporte de Facturas Recibidas</title>
 
   <link rel="stylesheet" href="css/style.css">
   <script src="js/feather.min.js"></script> <!-- Feather Icons -->
@@ -31,7 +31,7 @@ require_once "db.php";
   <!-- Título -->
   <div class="titulo">
     <img src="img/aftp-logo.png" alt="Logo AFTP" style="height: 60px;">
-    <h2>Reporte de Gastos Recibidos</h2>
+    <h2>Reporte de Facturas Recibidas</h2>
   </div>
 
   <!-- Botones -->
@@ -49,40 +49,40 @@ require_once "db.php";
     <?php
     try {
         $stmt = $pdo->prepare("
-            SELECT g.codigo, g.factura, g.fecha_emision, g.valor_gasto, 
+            SELECT f.numero_factura, f.concepto, f.fecha_emision, f.valor_factura,
                    p.razon_social AS proveedor, s.razon_social AS sucursal
-            FROM gastos g
-            INNER JOIN proveedores p ON g.cod_proveedor = p.cod_proveedor
-            INNER JOIN sucursal s ON g.cod_cia = s.cod_cia
-            ORDER BY g.fecha_creacion DESC
+            FROM facturas f
+            INNER JOIN proveedores p ON f.cod_proveedor = p.cod_proveedor
+            INNER JOIN sucursal s ON f.cod_cia = s.cod_cia
+            ORDER BY f.fecha_creacion DESC
         ");
         $stmt->execute();
 
         if ($stmt->rowCount() > 0) {
             echo "<table>";
             echo "<thead><tr>
-                    <th>Código Gasto</th>
-                    <th>Proveedor</th>
                     <th>N° Factura</th>
+                    <th>Proveedor</th>
+                    <th>Concepto</th>
                     <th>Fecha Emisión</th>
-                    <th>Monto Bs.</th>
+                    <th>Monto $.</th>
                     <th>Sucursal</th>
                   </tr></thead><tbody>";
 
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                 echo "<tr>";
-                echo "<td>" . htmlspecialchars($row['codigo']) . "</td>";
+                echo "<td>" . htmlspecialchars($row['numero_factura']) . "</td>";
                 echo "<td>" . htmlspecialchars($row['proveedor']) . "</td>";
-                echo "<td>" . htmlspecialchars($row['factura']) . "</td>";
+                echo "<td>" . htmlspecialchars($row['concepto']) . "</td>";
                 echo "<td>" . htmlspecialchars($row['fecha_emision']) . "</td>";
-                echo "<td style='text-align: right;'>" . number_format($row['valor_gasto'], 2, ',', '.') . "</td>";
+                echo "<td style='text-align: right;'>" . number_format($row['valor_factura'], 2, ',', '.') . "</td>";
                 echo "<td>" . htmlspecialchars($row['sucursal']) . "</td>";
                 echo "</tr>";
             }
 
             echo "</tbody></table>";
         } else {
-            echo "<p>No se encontraron gastos registrados.</p>";
+            echo "<p>No se encontraron facturas registradas.</p>";
         }
     } catch (PDOException $e) {
         echo "<p>Error en la consulta: " . htmlspecialchars($e->getMessage()) . "</p>";

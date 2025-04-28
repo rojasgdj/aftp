@@ -59,7 +59,7 @@ require_once 'db.php';
     .btn-etiqueta:hover {
       background: #007bff;
     }
-    .modal, .modal-envio {
+    .modal, .modal-envio, .modal-visor {
       display: none;
       position: fixed;
       z-index: 999;
@@ -201,6 +201,7 @@ require_once 'db.php';
             foreach ($stmt2->fetchAll() as $s):
               $fechaEmision = new DateTime($s['fecha_emision']);
               $fechaDestruccion = (clone $fechaEmision)->modify('+' . $s['anios_retencion'] . ' years');
+              $archivo = basename($s['ruta_archivo']);
             ?>
               <tr>
                 <td><?= htmlspecialchars($s['numero_factura']) ?></td>
@@ -209,9 +210,7 @@ require_once 'db.php';
                 <td><?= $fechaEmision->format('Y-m-d') ?></td>
                 <td><?= $fechaDestruccion->format('Y-m-d') ?></td>
                 <td>
-                  <a href="descargar.php?file=<?= urlencode(basename($s['ruta_archivo'])) ?>" target="_blank">
-                    <button class="btn-mini">📄 Ver</button>
-                  </a>
+                  <button class="btn-mini" onclick="verSoporte('<?= htmlspecialchars($archivo) ?>')">📄 Ver</button>
                   <button class="btn-mini" onclick="abrirModalEnvio('<?= htmlspecialchars($s['numero_factura']) ?>')">✉️ Enviar</button>
                 </td>
               </tr>
@@ -235,6 +234,18 @@ require_once 'db.php';
     </div>
   </div>
 
+  <!-- Modal Visor PDF -->
+  <div id="modalVisor" class="modal" onclick="cerrarModalVisor(event)">
+    <div class="modal-content" style="width: 80%; max-width: 800px; height: 90vh; position: relative;">
+      <span class="close" onclick="cerrarModalVisor()">&times;</span>
+      <h3 style="text-align: center;">📄 Vista de Soporte</h3>
+      <iframe id="visorPDF" src="" frameborder="0" style="width: 100%; height: 80%; margin-top: 10px; border-radius: 8px;"></iframe>
+      <div style="text-align: center; margin-top: 10px;">
+        <a id="btnDescargar" href="#" download class="btn">⬇️ Descargar PDF</a>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <script>
@@ -253,7 +264,31 @@ function cerrarModalEnvio() {
 }
 function imprimirEtiqueta(indice, desde, hasta) {
   const url = `etiqueta.php?indice=${indice}&desde=${desde}&hasta=${hasta}`;
-  window.open(url, '_blank'); // Se abre como reporte_facturas
+  window.open(url, '_blank');
+}
+
+function verSoporte(archivo) {
+  const visor = document.getElementById('visorPDF');
+  const botonDescargar = document.getElementById('btnDescargar');
+
+  visor.src = 'soportes/' + archivo; // ✅ Aquí corregimos
+  botonDescargar.href = 'soportes/' + archivo; // ✅ Aquí corregimos
+
+  document.getElementById('modalVisor').style.display = 'flex';
+}
+
+function cerrarModalVisor(event = null) {
+  const modal = document.getElementById('modalVisor');
+  if (event) {
+    const contenido = document.querySelector('#modalVisor .modal-content');
+    if (!contenido.contains(event.target)) {
+      modal.style.display = 'none';
+      document.getElementById('visorPDF').src = '';
+    }
+  } else {
+    modal.style.display = 'none';
+    document.getElementById('visorPDF').src = '';
+  }
 }
 </script>
 

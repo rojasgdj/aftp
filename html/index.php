@@ -88,7 +88,7 @@ $porcDisc = $total > 0 ? round(($discrepan * 100) / $total, 1) : 0;
     <img src="img/aftp-logo.png" alt="Logo AFTP">
     <h2>Sistema de Control de Archivo</h2>
     <div class="menu">
-      <button class="menu-toggle" onclick="toggleMenu()">☰ Menú</button> <!-- 🔥 Botón hamburguesa agregado -->
+      <button class="menu-toggle" onclick="toggleMenu()">☰ Menú</button>
       <a href="logout.php" class="btn">Cerrar sesión</a>
     </div>
   </div>
@@ -113,18 +113,19 @@ $porcDisc = $total > 0 ? round(($discrepan * 100) / $total, 1) : 0;
           <li><a href="gastos01.php"><i data-feather="dollar-sign"></i> Ingreso de Gastos</a></li>
         </ul>
       </li>
-      <li><a href="#"><i data-feather="bar-chart-2"></i> Reportes ▼</a>
-        <ul class="submenu">
-          <li><a href="reportefacturas.php"><i data-feather="file"></i> Facturas Recibidas</a></li>
-          <li><a href="reportegastos.php"><i data-feather="file-minus"></i> Gastos Recibidos</a></li>
-          <li><a href="reporteprov.php"><i data-feather="file-text"></i> Listado de Proveedores</a></li>
-        </ul>
-      </li>
       <li><a href="#"><i data-feather="archive"></i> AFTP ▼</a>
         <ul class="submenu">
           <li><a href="soportes.php"><i data-feather="upload-cloud"></i> Cargar Soporte</a></li>
           <li><a href="buscarsoporte.php"><i data-feather="search"></i> Buscar Soporte</a></li>
           <li><a href="indices.php"><i data-feather="layers"></i> Índices</a></li>
+        </ul>
+      </li>
+      <li><a href="#"><i data-feather="bar-chart-2"></i> Reportes ▼</a>
+        <ul class="submenu">
+          <li><a href="reportefacturas.php"><i data-feather="file"></i> Facturas Recibidas</a></li>
+          <li><a href="reportegastos.php"><i data-feather="file-minus"></i> Gastos Recibidos</a></li>
+          <li><a href="reporteprov.php"><i data-feather="file-text"></i> Listado de Proveedores</a></li>
+          <li><a href="reporte_vencimientos.php"><i data-feather="alert-triangle"></i> Soportes por Vencer</a></li> <!-- NUEVO -->
         </ul>
       </li>
     </ul>
