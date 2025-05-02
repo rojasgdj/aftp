@@ -18,11 +18,67 @@ if (isset($_SESSION['logged']) && $_SESSION['logged'] === true) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Iniciar Sesión - Sistema de Control de Archivo</title>
-  <link rel="stylesheet" href="css/style.css"> <!-- Tu nuevo style.css -->
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* Modal visor de manual */
+    .modal-manual {
+      display: none;
+      position: fixed;
+      z-index: 999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.6);
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-manual-content {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 800px;
+      max-height: 90vh;
+      position: relative;
+      overflow: hidden;
+    }
+    .modal-manual-content iframe {
+      width: 100%;
+      height: 500px;
+      border-radius: 8px;
+    }
+    .modal-manual .close {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      font-size: 24px;
+      color: red;
+      cursor: pointer;
+    }
+
+    /* Botón manual dentro del contenedor */
+    .manual-btn {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      cursor: pointer;
+      text-align: center;
+    }
+    .manual-btn img {
+      width: 48px;
+    }
+    .manual-btn div {
+      font-size: 12px;
+      color: #555;
+      font-weight: bold;
+      margin-top: 3px;
+    }
+  </style>
 </head>
 <body>
 
-<div class="container">
+<div class="container" style="position: relative;">
 
   <div class="titulo">
     <img src="img/aftp-logo.png" alt="Logo AFTP" style="height: 80px;">
@@ -43,8 +99,7 @@ if (isset($_SESSION['logged']) && $_SESSION['logged'] === true) {
     <button type="submit" class="btn">Iniciar Sesión</button>
 
     <div class="extra-links">
-      <a href="crearusuario.php">¿No tienes cuenta? Regístrate aquí</a><br>
-      <a href="AFTP.pdf" target="_blank">📄 Ver Manual de Usuario</a>
+      <a href="crearusuario.php">¿No tienes cuenta? Regístrate aquí</a>
     </div>
   </form>
 
@@ -52,6 +107,24 @@ if (isset($_SESSION['logged']) && $_SESSION['logged'] === true) {
     Copyright © 2025 - AFTP | Design with us
   </div>
 
+  <!--Botón dentro del contenedor -->
+  <div class="manual-btn" onclick="mostrarManual()">
+    <img src="img/carpeta.png" alt="Ver manual" title="Ver Manual de Usuario">
+    <div>Manual de usuario</div>
+  </div>
+
+</div>
+
+<!-- Modal del visor -->
+<div class="modal-manual" id="modalManual">
+  <div class="modal-manual-content">
+    <span class="close" onclick="cerrarManual()">&times;</span>
+    <h3 style="text-align: center;">Manual de Usuario</h3>
+    <iframe src="/manual/AFTP.pdf"></iframe>
+    <div style="text-align: center; margin-top: 10px;">
+      <a href="/manual/AFTP.pdf" download class="btn">⬇️ Descargar Manual</a>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -59,6 +132,14 @@ if (isset($_SESSION['logged']) && $_SESSION['logged'] === true) {
     document.getElementById("cedula").value = "";
     document.getElementById("clave1").value = "";
   };
+
+  function mostrarManual() {
+    document.getElementById("modalManual").style.display = 'flex';
+  }
+
+  function cerrarManual() {
+    document.getElementById("modalManual").style.display = 'none';
+  }
 </script>
 
 </body>
