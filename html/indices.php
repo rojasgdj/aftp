@@ -271,8 +271,8 @@ function verSoporte(archivo) {
   const visor = document.getElementById('visorPDF');
   const botonDescargar = document.getElementById('btnDescargar');
 
-  visor.src = 'soportes/' + archivo; // ✅ Aquí corregimos
-  botonDescargar.href = 'soportes/' + archivo; // ✅ Aquí corregimos
+  visor.src = 'soportes/' + archivo; // Aquí corregimos
+  botonDescargar.href = 'soportes/' + archivo; // Aquí corregimos
 
   document.getElementById('modalVisor').style.display = 'flex';
 }

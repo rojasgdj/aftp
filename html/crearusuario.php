@@ -21,7 +21,7 @@ if (isset($_SESSION['logged']) && $_SESSION['logged'] === true) {
   <meta name="author" content="Bits Software">
   <title>Registro de Usuario - Sistema de Control AFTP</title>
 
-  <link rel="stylesheet" href="css/style.css"> <!-- Correcto style.css -->
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 

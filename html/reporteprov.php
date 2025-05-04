@@ -58,7 +58,7 @@ require_once "db.php";
             echo "<table>";
             echo "<thead><tr>
                     <th>Código</th>
-                    <th>RIF / NIT</th>
+                    <th>NIT</th>
                     <th>Razón Social</th>
                     <th>Teléfono</th>
                     <th>Contacto</th>
